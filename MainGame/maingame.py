@@ -1,4 +1,5 @@
 import pygame, sys, time, random
+import tkinter as tk
 from pygame.locals import *
 pygame.init()
 
@@ -15,10 +16,13 @@ pygame.display.set_icon(icon)
 bg=pygame.transform.scale(pygame.image.load(r'MainGame\Image\background.png'),screen_size)
 end_bg=1100
 start_bg=200
+
 #Load ảnh xe
 car_pic2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\car2.png'),(150,150))
 car_pic1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\car2.png'),(150,150))
 item_pic=pygame.image.load(r'MainGame\Image\item.png')
+#Thêm âm thanh
+
 #Màu
 white=(255,255,255)
 black=(0,0,0)
@@ -89,6 +93,9 @@ class Buttons():
     def is_in(self,x,y):
         if x>self.x and x<self.x+self.height and y>self.y and y<self.y+self.width:
             return True
+
+
+
 #Vào đua
 def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_start):
     #Khởi tạo xe 
@@ -402,4 +409,44 @@ def ranked_rs(image,width,height,player,com1,com2,com3,com4):
         draw_text(str(lt[4].name),new_font,black,screen,screen_size[0]/4+screen_size[0]/5,15*screen_size[1]/20)
         pygame.display.flip()
     return False
-main_menu()
+
+def login():
+    username = entry_username.get()
+    password = entry_password.get()
+    
+    # Kiểm tra thông tin đăng nhập
+    if username == "admin" and password == "password":
+        # Đăng nhập thành công, chuyển màn hình
+        window_login.destroy()  # Đóng màn hình đăng nhập
+        
+        # Tạo màn hình mới sau khi đăng nhập thành công
+        main_menu()
+        
+        # Thêm các thành phần và chức năng cho màn hình mới ở đây
+        
+    else:
+        # Đăng nhập không thành công, hiển thị thông báo lỗi
+        label_error.config(text="Thông tin đăng nhập không đúng")
+
+# Tạo màn hình đăng nhập
+window_login = tk.Tk()
+
+# Thêm các thành phần vào màn hình đăng nhập
+label_username = tk.Label(window_login, text="Tên đăng nhập:")
+label_username.pack()
+entry_username = tk.Entry(window_login)
+entry_username.pack()
+
+label_password = tk.Label(window_login, text="Mật khẩu:")
+label_password.pack()
+entry_password = tk.Entry(window_login, show="*")
+entry_password.pack()
+
+button_login = tk.Button(window_login, text="Đăng nhập", command=login)
+button_login.pack()
+
+label_error = tk.Label(window_login, text="")
+label_error.pack()
+
+# Chạy màn hình đăng nhập
+window_login.mainloop()
