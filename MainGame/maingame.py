@@ -1,8 +1,9 @@
-import pygame, sys, time, random
+import pygame, sys, time, random, os
 import tkinter as tk
 from pygame.locals import *
 pygame.init()
-
+pygame.mixer.init()
+pygame.mixer.set_num_channels(10)
 FPS = 120
 fpsClock = pygame.time.Clock()
 
@@ -19,13 +20,15 @@ car_pic2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\car2.png'),(1
 car_pic1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\car2.png'),(150,150))
 item_pic=pygame.image.load(r'MainGame\Image\item.png')
 #Thêm âm thanh
-
+flash_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\flash.mp3')
+back_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\back.mp3')
+tele_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\teleport.mp3')
 #Màu
 white=(255,255,255)
 black=(0,0,0)
 red=(255,0,0)
 #Tham số
-
+current_money=20000
 #Set font
 font = pygame.font.SysFont("Arial", 50, bold=True, italic=False)
 new_font = pygame.font.SysFont("Arial", 30, bold=True, italic=False)
@@ -35,9 +38,36 @@ def draw_text(text, font, color, surface, x, y):
     text_obj = font.render(text, 1, color)
     text_rect = text_obj.get_rect()
     text_rect.center = (x,y)
-    surface.blit(text_obj, text_rect)        
+    surface.blit(text_obj, text_rect)      
+def screen_resize(new_screen_size):
+    screen = pygame.display.set_mode(new_screen_size,pygame.RESIZABLE)  
 #Class
+class User():
+    def __init__(self,username):
+        self.money = current_money
+        self.htr_in = 1
+        self.hrt = ''
+        self.username=username
+        #Tạo đường dẫn
+        self.path='MainGame/'+self.username+'_history'
+    def create_player_history(self):#tạo một lần duy nhất cho 1 user
+        if os.path.exists(self.path) == False:
+            os.mkdir(self.path)
+    def history_saved(self,screen):
+        self.image_file = self.path + '/history'+str(self.htr_in)+'.png'
+        pygame.image.save(screen,self.image_file)
+        self.htr_in +=1
+    def money_update(self,player):
+        if player.rank == 1:
+            self.money += 5000
+        if player.rank == 2:
+            self.money += 2000
+        else:
+            self.money -= 1000
+
 class Car():
+    name=''
+    color=(0,0,0)
     def __init__(self,screen,image,lane,buff_speed=False,better_start=False):
         self.image=image
         self.y=100+(lane-1)*140
@@ -70,14 +100,18 @@ class Item():
         self.rect=self.image.get_rect(center=(x,y))
         self.screen.blit(self.image,self.rect)
     def affect(self,x):
-        self.type=random.randint(0,5)
+        self.type=random.randint(0,4)
         if self.type==0 or self.type==2:
             x-=100
+            pygame.mixer.Channel(4).play(back_sound)
         elif self.type==1 or self.type==3:
             x+=100
+            pygame.mixer.Channel(5).play(flash_sound)
         else:
             x=end_bg
+            pygame.mixer.Channel(6).play(tele_sound)
         return x
+    
 class Buttons():
     def __init__(self,height,width,image,x,y,screen):
         self.height=height
@@ -97,13 +131,18 @@ class Buttons():
 
 
 #Vào đua
-def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_start,screen):
+def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_start,user,player_name,screen):
     #Khởi tạo xe 
     player=Car(screen,player_pic,2,buff_speed,better_start)
     com1=Car(screen,com1_pic,1)
     com2=Car(screen,com2_pic,3)
     com3=Car(screen,com3_pic,4)
     com4=Car(screen,com4_pic,5)
+    player.name = player_name
+    com1.name = 'com'
+    com2.name ='com'
+    com3.name ='com'
+    com4.name ='com'
     #Khởi tạo biến item
     item1=Item()
     item2=Item()
@@ -174,23 +213,23 @@ def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_st
                 if item1.exist:
                     item1.draw(item1_x,item1_y,screen)
                     #Xử lý nếu xe chạm vào item
-                    if player.is_in(item1_x-50,item1_y):
+                    if player.is_in(item1_x,item1_y):
                         player_x=item1.affect(player_x)
                         num_item-=1
                         item1.exist=False
-                    if com1.is_in(item1_x-50,item1_y):
+                    if com1.is_in(item1_x,item1_y):
                         com1_x=item1.affect(com1_x)
                         num_item-=1
                         item1.exist=False
-                    if com2.is_in(item1_x-50,item1_y):
+                    if com2.is_in(item1_x,item1_y):
                         com2_x=item1.affect(com2_x)
                         num_item-=1
                         item1.exist=False
-                    if com3.is_in(item1_x-50,item1_y):
+                    if com3.is_in(item1_x,item1_y):
                         com3_x=item1.affect(com3_x)
                         num_item-=1
                         item1.exist=False
-                    if com4.is_in(item1_x-50,item1_y):
+                    if com4.is_in(item1_x,item1_y):
                         com4_x=item1.affect(com4_x)
                         num_item-=1
                         item1.exist=False
@@ -249,15 +288,9 @@ def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_st
             if (player.finish() and com1.finish() and com2.finish() and com3.finish() and com4.finish()):
                 start=False
                 ranked=True
-    #In kết quả
-        if ranked:
-            draw_text(str(player.rank),font,white,screen,end_bg+100,player.y)
-            draw_text(str(com1.rank),font,white,screen,end_bg+100,com1.y)
-            draw_text(str(com2.rank),font,white,screen,end_bg+100,com2.y)
-            draw_text(str(com3.rank),font,white,screen,end_bg+100,com3.y)
-            draw_text(str(com4.rank),font,white,screen,end_bg+100,com4.y)
             # bảng xếp hạng
-            check_rank = ranked_rs(r'MainGame\Image\item.png',screen_size[0]/2,4*screen_size[1]/5,player,com1,com2,com3,com4,screen)
+        if ranked:
+            check_rank = ranked_rs(r'MainGame\Image\item.png',screen_size[0]/2,4*screen_size[1]/5,player,com1,com2,com3,com4,user,screen)
 
         pygame.display.update()
         #thoát ra menu
@@ -275,68 +308,110 @@ def shopping(screen):
     #Vòng lặp
     running_shop=True
     while running_shop:
+        spot = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 pygame.quit()
+            if event.type == pygame.VIDEORESIZE:
+                new_screen_size = event.dict["size"]
+                screen_resize(new_screen_size)
             if event.type==pygame.MOUSEBUTTONDOWN:
-                spot=event.pos
                 if buy_buff_speed.is_in(spot[0],spot[1]):
+                    pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     buff_speed=True
                     buy_buff_speed.img=item_pic
                 if buy_better_start.is_in(spot[0],spot[1]):
+                    pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     better_start=True
                     buy_better_start.img=item_pic
                 if quit_bt.is_in(spot[0],spot[1]):
+                    pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     running_shop=False
+            if buy_buff_speed.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            elif buy_better_start.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            elif quit_bt.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
         screen.fill(black)
         buy_better_start.draw()
         buy_buff_speed.draw()
         quit_bt.draw()
         pygame.display.update()
     return (buff_speed,better_start)
+
 #Sảnh chờ
-
-
-
-
-def main_menu():
-    screen=pygame.display.set_mode(screen_size)
+def main_menu(username):
+    current_user = User(username)
+    current_user.create_player_history()
+    screen=pygame.display.set_mode(screen_size,pygame.RESIZABLE)
     pygame.display.set_caption("Car Bet")
     icon=pygame.image.load(r'MainGame\Image\item.png')
     pygame.display.set_icon(icon)
     #Khởi tạo nút
+    profile_bt = Buttons(200,100,item_pic,20,20,screen)
     start_bt=Buttons(200,100,item_pic,540,570,screen)
     shop_bt=Buttons(100,100,item_pic,50,570,screen)
     buff=(False,False)
-    #Vòng lặp
+    temp_bt = Buttons(100,100,item_pic,980,570,screen)
+    player_name='2'
     running_menu=True
+    #Vòng lặp
     while running_menu:
+        #Lấy tọa độ chuột
+        spot = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 pygame.quit()
+            #Thay đổi kích thước màn hình
+            if event.type == pygame.VIDEORESIZE:
+                new_screen_size = event.dict["size"]
+                screen_resize(new_screen_size)
             if event.type==pygame.MOUSEBUTTONDOWN:
-                spot=event.pos
                 #Xử lý thao tác trên các nút
                 if start_bt.is_in(spot[0],spot[1]):
                     running_menu=False
-                    run_game(car_pic2,car_pic2,car_pic2,car_pic2,car_pic2,buff[0],buff[1],screen)
+                    pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                    run_game(car_pic2,car_pic2,car_pic2,car_pic2,car_pic2,buff[0],buff[1],current_user,player_name,screen)
                     running_menu=True
                 if shop_bt.is_in(spot[0],spot[1]):
                     running_menu=False
+                    #đổi lại hình dạng chuột ban đầu sau khi click
+                    pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     buff=shopping(screen)
                     running_menu=True
+                if profile_bt.is_in(spot[0],spot[1]):
+                    running_menu=False
+                    pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                    profile_display(current_user,screen)
+                    running_menu=True
+            #Thay đổi hình dạng chuộtchuột
+            if start_bt.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            elif shop_bt.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            elif profile_bt.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
         screen.fill(black)
         #Vẽ nút
+        profile_bt.draw()
         shop_bt.draw()
         start_bt.draw()
         pygame.display.update()
 
-def ranked_rs(image,width,height,player,com1,com2,com3,com4,screen):
+def ranked_rs(image,width,height,player,com1,com2,com3,com4,user,screen):
     rank_img = pygame.transform.scale(pygame.image.load(image),(width,height))
     rank_rect = rank_img.get_rect(topleft=(screen_size[0]/4,screen_size[1]/10))
     running_rank = True
     home_bt = Buttons(screen_size[0]/16,screen_size[1]/8,item_pic,screen_size[0]/4,9*screen_size[1]/10,screen)
+    save_bt = Buttons(screen_size[0]/16,screen_size[1]/8,item_pic,3*screen_size[0]/4,9*screen_size[1]/10,screen)
     lt = [player,com1,com2,com3,com4]
+    #Cập nhật tiền 
+    user.money_update(player)
     # sắp xếp thứ tự xếp hạng
     j=0
     while j < len(lt):
@@ -351,58 +426,83 @@ def ranked_rs(image,width,height,player,com1,com2,com3,com4,screen):
             i+=1
         if sw == False:
             break
-        
-
-
-    #tên tạm thời
-    player.name ="player"
-    com1.name ="com1"
-    com2.name ="com2"
-    com3.name ="com3"
-    com4.name ="com4"
-
-
     while running_rank:
+        spot=pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 pygame.quit()
+            if event.type == pygame.VIDEORESIZE:
+                new_screen_size = event.dict["size"]
+                screen_resize(new_screen_size)
             if event.type==pygame.MOUSEBUTTONDOWN:
-                spot=event.pos
                 if home_bt.is_in(spot[0],spot[1]):
+                    pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     running_rank = False
-                    main_menu()
+                if save_bt.is_in(spot[0],spot[1]):
+                    user.history_saved(screen)
+            if home_bt.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            elif save_bt.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            else :
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+
 
         screen.blit(rank_img,rank_rect)
         #vẽ nút
         home_bt.draw()
-        draw_text('Home',new_font,red,screen,home_bt.x+(screen_size[0]/16)/2,home_bt.y+(screen_size[1]/8)/2)
+        save_bt.draw()
         draw_text('1',new_font,black,screen,screen_size[0]/4+screen_size[0]/40,3*screen_size[1]/20)
         draw_text('2',new_font,black,screen,screen_size[0]/4+screen_size[0]/40,6*screen_size[1]/20)
         draw_text('3',new_font,black,screen,screen_size[0]/4+screen_size[0]/40,9*screen_size[1]/20)
         draw_text('4',new_font,black,screen,screen_size[0]/4+screen_size[0]/40,12*screen_size[1]/20)
         draw_text('5',new_font,black,screen,screen_size[0]/4+screen_size[0]/40,15*screen_size[1]/20)
-        draw_text(str(lt[0].name),new_font,black,screen,screen_size[0]/4+screen_size[0]/5,3*screen_size[1]/20)
-        draw_text(str(lt[1].name),new_font,black,screen,screen_size[0]/4+screen_size[0]/5,6*screen_size[1]/20)
-        draw_text(str(lt[2].name),new_font,black,screen,screen_size[0]/4+screen_size[0]/5,9*screen_size[1]/20)
-        draw_text(str(lt[3].name),new_font,black,screen,screen_size[0]/4+screen_size[0]/5,12*screen_size[1]/20)
-        draw_text(str(lt[4].name),new_font,black,screen,screen_size[0]/4+screen_size[0]/5,15*screen_size[1]/20)
+        draw_text(lt[0].name,new_font,lt[0].color,screen,screen_size[0]/4+screen_size[0]/5,3*screen_size[1]/20)
+        draw_text(lt[1].name,new_font,lt[1].color,screen,screen_size[0]/4+screen_size[0]/5,6*screen_size[1]/20)
+        draw_text(lt[2].name,new_font,lt[2].color,screen,screen_size[0]/4+screen_size[0]/5,9*screen_size[1]/20)
+        draw_text(lt[3].name,new_font,lt[3].color,screen,screen_size[0]/4+screen_size[0]/5,12*screen_size[1]/20)
+        draw_text(lt[4].name,new_font,lt[4].color,screen,screen_size[0]/4+screen_size[0]/5,15*screen_size[1]/20)
         pygame.display.flip()
     return False
+
+def profile_display(user,screen):
+    run = True
+    return_bt = Buttons(screen_size[0]/24,screen_size[0]/24,item_pic,23*screen_size[0]/24,screen_size[1]-screen_size[0]/24,screen)
+    while run:
+        spot=pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == MOUSEBUTTONDOWN:
+                if return_bt.is_in(spot[0],spot[1]):
+                    pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                    run = False
+        if return_bt.is_in(spot[0],spot[1]):
+            pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+        else:
+            pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+    #vẽ màn hình, nút
+        screen.fill((0,0,0))
+        return_bt.draw()
+        draw_text('username:'+user.username,font,white,screen,screen_size[0]/4,screen_size[1]/4)
+        draw_text('Money:'+str(user.money),font,white,screen,screen_size[0]/4,screen_size[1]/3)
+        pygame.display.flip()
 
 def login():
     username = entry_username.get()
     password = entry_password.get()
-    
+
     # Kiểm tra thông tin đăng nhập
     if username == "admin" and password == "password":
         # Đăng nhập thành công, chuyển màn hình
         window_login.destroy()  # Đóng màn hình đăng nhập
-        
+
         # Tạo màn hình mới sau khi đăng nhập thành công
-        main_menu()
-        
+        #truyền tạm biến user lấy username để tạo folder lưu ảnh
+        main_menu(username)
+
         # Thêm các thành phần và chức năng cho màn hình mới ở đây
-        
+
     else:
         # Đăng nhập không thành công, hiển thị thông báo lỗi
         label_error.config(text="Thông tin đăng nhập không đúng")
@@ -418,6 +518,7 @@ entry_username.pack()
 
 label_password = tk.Label(window_login, text="Mật khẩu:")
 label_password.pack()
+
 entry_password = tk.Entry(window_login, show="*")
 entry_password.pack()
 
@@ -426,6 +527,5 @@ button_login.pack()
 
 label_error = tk.Label(window_login, text="")
 label_error.pack()
-
 # Chạy màn hình đăng nhập
 window_login.mainloop()
