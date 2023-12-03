@@ -64,7 +64,8 @@ class User():
             self.money += 2000
         else:
             self.money -= 1000
-
+    def money_change(self,dif):
+        self.money+=dif
 class Car():
     name=''
     color=(0,0,0)
@@ -297,7 +298,7 @@ def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_st
         if check_rank ==False:
             break
     return player_rank
-def shopping(screen):
+def shopping(screen,user):
     #Khởi tạo nút
     buy_buff_speed=Buttons(200,100,car_pic1,340,360,screen)
     buy_better_start=Buttons(200,100,car_pic1,740,360,screen)
@@ -319,10 +320,12 @@ def shopping(screen):
                 if buy_buff_speed.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     buff_speed=True
+                    user.money_change(-2000)
                     buy_buff_speed.img=item_pic
                 if buy_better_start.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     better_start=True
+                    user.money_change(-2000)
                     buy_better_start.img=item_pic
                 if quit_bt.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
@@ -380,7 +383,7 @@ def main_menu(username):
                     running_menu=False
                     #đổi lại hình dạng chuột ban đầu sau khi click
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
-                    buff=shopping(screen)
+                    buff=shopping(screen,current_user)
                     running_menu=True
                 if profile_bt.is_in(spot[0],spot[1]):
                     running_menu=False
