@@ -15,7 +15,7 @@ bg=pygame.transform.scale(pygame.image.load(r'MainGame\Image\bg3.jpg'),screen_si
 road=pygame.transform.scale(pygame.image.load(r'MainGame\Image\road.jpg'),(1280,400))
 start_road=pygame.transform.scale(pygame.image.load(r'MainGame\Image\start_road.jpg'),(1280,400))
 finish_road=pygame.transform.scale(pygame.image.load(r'MainGame\Image\finish_road.jpg'),(1280,400))
-end_bg=1100
+end_bg=1000
 start_bg=200
 #Maps
 map1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\bg1.jpg'),(1280,720))
@@ -205,9 +205,15 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
             if event.type==pygame.MOUSEBUTTONDOWN:
                 start=True
         screen.blit(bg,(bg_x,0))
-        screen.blit(bg,(bg_x+1280,0))
-        screen.blit(road,(road_x,240))
-        screen.blit(road,(road_x+1280,240))
+        #Vẽ đường
+        if road_time==0:
+            screen.blit(start_road,(road_x,240))
+            screen.blit(road,(road_x+1280,240))
+        elif road_time>=10:
+            screen.blit(finish_road,(road_x,240))
+        else:
+            screen.blit(road,(road_x,240))
+            screen.blit(road,(road_x+1280,240))
         road_speed=5
         #Vẽ xe
         player.draw(player_x,player_rank)
@@ -215,6 +221,7 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
         com2.draw(com2_x,com2_rank)
         com3.draw(com3_x,com3_rank)
         com4.draw(com4_x,com4_rank)
+        #Cho đường chạy
         if start:
             if not(road_finish):
                 road_x-=road_speed
@@ -224,8 +231,8 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
                 if road_time==10:
                     road_finish=True
             else:
-                bg_sp=0
                 road_speed=0
+                    
         #Cập nhật toạ độ cho xe
             if player_x<0:
                 player_x=0
@@ -237,6 +244,7 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
                 com3_x=0
             if com4_x<0:
                 com4_x=0
+            #Nếu đường đã chạy hết
             if road_finish:
                 if not(player.finish()):
                     player_x+=random.randint(0,max_speed)
