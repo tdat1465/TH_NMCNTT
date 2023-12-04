@@ -12,13 +12,28 @@ screen_size=(1280,720)
 
 #Thêm background
 bg=pygame.transform.scale(pygame.image.load(r'MainGame\Image\bg3.jpg'),screen_size)
-road=pygame.transform.scale(pygame.image.load(r'MainGame\Image\road1.jpg'),(1280,400))
+road=pygame.transform.scale(pygame.image.load(r'MainGame\Image\road.jpg'),(1280,400))
+start_road=pygame.transform.scale(pygame.image.load(r'MainGame\Image\start_road.jpg'),(1280,400))
+finish_road=pygame.transform.scale(pygame.image.load(r'MainGame\Image\finish_road.jpg'),(1280,400))
 end_bg=1100
 start_bg=200
+#Maps
+map1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\bg1.jpg'),(1280,720))
+map2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\bg2.jpg'),(1280,720))
+map3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\bg3.jpg'),(1280,720))
+map4=pygame.transform.scale(pygame.image.load(r'MainGame\Image\bg4.jpg'),(1280,720))
+map5=pygame.transform.scale(pygame.image.load(r'MainGame\Image\bg5.jpg'),(1280,720))
+pick_map1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\pick_bg1.jpg'),(400,300))
+pick_map2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\pick_bg2.jpg'),(400,300))
+pick_map3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\pick_bg3.jpg'),(400,300))
+pick_map4=pygame.transform.scale(pygame.image.load(r'MainGame\Image\pick_bg4.jpg'),(400,300))
+pick_map5=pygame.transform.scale(pygame.image.load(r'MainGame\Image\pick_bg5.jpg'),(400,300))
+maps=[map1,map2,map3,map4,map5]
+pick_maps=[pick_map1,pick_map2,pick_map3,pick_map4,pick_map5]
 
 #Load ảnh xe
-car_pic2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\car2.png'),(150,150))
-car_pic1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\car2.png'),(150,150))
+car_pic2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\car.jpg'),(150,150))
+car_pic1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\car.jpg'),(150,150))
 item_pic=pygame.image.load(r'MainGame\Image\item.png')
 #Thêm âm thanh
 flash_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\flash.mp3')
@@ -135,7 +150,7 @@ class Buttons():
 
 
 #Vào đua
-def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_start,user,player_name,screen):
+def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_start,user,player_name,screen):
     #Khởi tạo xe 
     player=Car(screen,player_pic,2,buff_speed,better_start)
     com1=Car(screen,com1_pic,1)
@@ -147,6 +162,7 @@ def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_st
     com2.name ='com'
     com3.name ='com'
     com4.name ='com'
+    bg=maps[map_index]
     #Khởi tạo biến item
     item1=Item()
     item2=Item()
@@ -190,8 +206,8 @@ def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_st
                 start=True
         screen.blit(bg,(bg_x,0))
         screen.blit(bg,(bg_x+1280,0))
-        screen.blit(road,(road_x,245))
-        screen.blit(road,(road_x+1280,245))
+        screen.blit(road,(road_x,240))
+        screen.blit(road,(road_x+1280,240))
         road_speed=5
         #Vẽ xe
         player.draw(player_x,player_rank)
@@ -211,6 +227,16 @@ def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_st
                 bg_sp=0
                 road_speed=0
         #Cập nhật toạ độ cho xe
+            if player_x<0:
+                player_x=0
+            if com1_x<0:
+                com1_x=0
+            if com2_x<0:
+                com2_x=0
+            if com3_x<0:
+                com3_x=0
+            if com4_x<0:
+                com4_x=0
             if road_finish:
                 if not(player.finish()):
                     player_x+=random.randint(0,max_speed)
@@ -387,19 +413,179 @@ def shopping(screen,user):
         pygame.display.update()
     return (buff_speed,better_start)
 
+def pick_map(buff_speed,buff_start,current_user,player_name,char,screen):
+    pick_bt=Buttons(200,100,item_pic,540,570,screen)
+    next_bt=Buttons(100,100,item_pic,980,340,screen)
+    back_bt=Buttons(100,100,item_pic,200,340,screen)
+    index=0
+    run_map=True
+    while run_map:
+        spot = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.VIDEORESIZE:
+                new_screen_size = event.dict["size"]
+                screen_resize(new_screen_size)
+            if event.type==MOUSEBUTTONDOWN:
+                if pick_bt.is_in(spot[0],spot[1]):
+                    pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                    run_map=False
+                    run_game(index,car_pic2,car_pic2,car_pic2,car_pic2,car_pic2,buff_speed,buff_start,current_user,player_name,screen)
+                if next_bt.is_in(spot[0],spot[1]):
+                    index+=1
+                    if index>4:
+                        index=0
+                if back_bt.is_in(spot[0],spot[1]):
+                    index-=1
+                    if index<0:
+                        index=4
+            if pick_bt.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            elif next_bt.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            elif back_bt.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+        pick_bt.draw()
+        next_bt.draw()
+        back_bt.draw()
+        screen.blit(pick_maps[index],(440,210))
+        pygame.display.update()
+
+def pick_char(screen):
+    pick1=Buttons(200,200,item_pic,280,160,screen)
+    pick2=Buttons(200,200,item_pic,540,160,screen)
+    pick3=Buttons(200,200,item_pic,800,160,screen)
+    pick4=Buttons(200,200,item_pic,410,400,screen)
+    pick5=Buttons(200,200,item_pic,670,400,screen)
+    return_bt=Buttons(150,150,item_pic,0,0,screen)
+    accept=0
+    index=0
+    run_map=True
+    while run_map:
+        spot = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.VIDEORESIZE:
+                new_screen_size = event.dict["size"]
+                screen_resize(new_screen_size)
+            if event.type==MOUSEBUTTONDOWN:
+                if accept==0:
+                    if pick1.is_in(spot[0],spot[1]):
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        index=1
+                        accept+=1
+                    if pick2.is_in(spot[0],spot[1]):
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        index=2
+                        accept+=1
+                    if pick3.is_in(spot[0],spot[1]):
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        index=3
+                        accept+=1
+                    if pick4.is_in(spot[0],spot[1]):
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        index=4
+                        accept+=1
+                    if pick5.is_in(spot[0],spot[1]):
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        index=5
+                        accept+=1
+                elif accept==1:
+                    if pick1.is_in(spot[0],spot[1]):
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        return 5*(index-1)
+                    if pick2.is_in(spot[0],spot[1]):
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        return 5*(index-1)+1
+                    if pick3.is_in(spot[0],spot[1]):
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        return 5*(index-1)+2
+                    if pick4.is_in(spot[0],spot[1]):
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        return 5*(index-1)+3
+                    if pick5.is_in(spot[0],spot[1]):
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        return 5*(index-1)+4
+                    if return_bt.is_in(spot[0],spot[1]):
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        accept-=1
+                        index=0
+            if pick1.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            elif pick2.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            elif pick3.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            elif pick4.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            elif pick5.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+        if index==0:
+            pick1.img=item_pic
+            pick2.img=item_pic
+            pick3.img=item_pic
+            pick4.img=item_pic
+            pick5.img=item_pic
+        if index==1:
+            pick1.img=car_pic1
+            pick2.img=car_pic1
+            pick3.img=car_pic1
+            pick4.img=car_pic1
+            pick5.img=car_pic1
+        if index==2:
+            pick1.img=car_pic1
+            pick2.img=car_pic1
+            pick3.img=car_pic1
+            pick4.img=car_pic1
+            pick5.img=car_pic1
+        if index==3:
+            pick1.img=car_pic1
+            pick2.img=car_pic1
+            pick3.img=car_pic1
+            pick4.img=car_pic1
+            pick5.img=car_pic1
+        if index==4:
+            pick1.img=car_pic1
+            pick2.img=car_pic1
+            pick3.img=car_pic1
+            pick4.img=car_pic1
+            pick5.img=car_pic1
+        if index==5:
+            pick1.img=car_pic1
+            pick2.img=car_pic1
+            pick3.img=car_pic1
+            pick4.img=car_pic1
+            pick5.img=car_pic1
+        screen.fill(black)
+        pick1.draw()
+        pick2.draw()
+        pick3.draw()
+        pick4.draw()
+        pick5.draw()
+        if accept==1:
+            return_bt.draw()
+        pygame.display.update()
+
 #Sảnh chờ
 def main_menu(username):
     current_user = User(username)
     current_user.create_player_history()
     screen=pygame.display.set_mode(screen_size,pygame.RESIZABLE)
     pygame.display.set_caption("Car Bet")
-    icon=pygame.image.load(r'MainGame\Image\item.png')
+    icon=pygame.image.load(r'MainGame\Image\car.jpg')
     pygame.display.set_icon(icon)
     #Khởi tạo nút
     profile_bt = Buttons(200,100,item_pic,20,20,screen)
     start_bt=Buttons(200,100,item_pic,540,570,screen)
     shop_bt=Buttons(100,100,item_pic,50,570,screen)
     buff=(False,False)
+    char=-1
     player_name='2'
     running_menu=True
     #Vòng lặp
@@ -418,7 +604,9 @@ def main_menu(username):
                 if start_bt.is_in(spot[0],spot[1]):
                     running_menu=False
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
-                    run_game(car_pic2,car_pic2,car_pic2,car_pic2,car_pic2,buff[0],buff[1],current_user,player_name,screen)
+                    char=pick_char(screen)
+                    if char>=0:
+                        pick_map(buff[0],buff[1],current_user,player_name,char,screen)
                     running_menu=True
                 if shop_bt.is_in(spot[0],spot[1]):
                     running_menu=False
