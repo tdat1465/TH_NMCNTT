@@ -11,7 +11,8 @@ fpsClock = pygame.time.Clock()
 screen_size=(1280,720)
 
 #Thêm background
-bg=pygame.transform.scale(pygame.image.load(r'MainGame\Image\background.png'),screen_size)
+bg=pygame.transform.scale(pygame.image.load(r'MainGame\Image\bg3.jpg'),screen_size)
+road=pygame.transform.scale(pygame.image.load(r'MainGame\Image\road1.jpg'),(1280,400))
 end_bg=1100
 start_bg=200
 
@@ -23,6 +24,8 @@ item_pic=pygame.image.load(r'MainGame\Image\item.png')
 flash_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\flash.mp3')
 back_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\back.mp3')
 tele_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\teleport.mp3')
+#Nhạc
+
 #Màu
 white=(255,255,255)
 black=(0,0,0)
@@ -71,7 +74,7 @@ class Car():
     color=(0,0,0)
     def __init__(self,screen,image,lane,buff_speed=False,better_start=False):
         self.image=image
-        self.y=100+(lane-1)*140
+        self.y=280+(lane-1)*80
         self.buff_speed=buff_speed
         self.better_start=better_start
         self.screen=screen
@@ -81,7 +84,7 @@ class Car():
         self.screen.blit(self.image,self.rect)
         self.rank=rank
     def is_in(self,x,y):
-        if self.x==x and self.y==y:
+        if self.x>=x-50 and self.x<=x+50 and self.y==y:
             return True
     def finish(self):
         if self.x>=end_bg:
@@ -109,7 +112,7 @@ class Item():
             x+=100
             pygame.mixer.Channel(5).play(flash_sound)
         else:
-            x=end_bg
+            pass
             pygame.mixer.Channel(6).play(tele_sound)
         return x
     
@@ -155,9 +158,10 @@ def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_st
     else:
         player_x=start_bg
     if player.buff_speed:
-        max_speed=2
+        max_speed=25
     else:
-        max_speed=1
+        max_speed=20
+    max_com=20
     com1_x=start_bg
     com2_x=start_bg
     com3_x=start_bg
@@ -169,9 +173,12 @@ def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_st
     com4_rank=0
     running=True
     bg_x=0
+    road_x=0
     rank=1
     ranked=False
     check_rank = True
+    road_finish=False
+    road_time=0    
     #Vòng lặp game
     start=False
     while running:
@@ -182,6 +189,10 @@ def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_st
             if event.type==pygame.MOUSEBUTTONDOWN:
                 start=True
         screen.blit(bg,(bg_x,0))
+        screen.blit(bg,(bg_x+1280,0))
+        screen.blit(road,(road_x,245))
+        screen.blit(road,(road_x+1280,245))
+        road_speed=5
         #Vẽ xe
         player.draw(player_x,player_rank)
         com1.draw(com1_x,com1_rank)
@@ -189,30 +200,56 @@ def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_st
         com3.draw(com3_x,com3_rank)
         com4.draw(com4_x,com4_rank)
         if start:
+            if not(road_finish):
+                road_x-=road_speed
+                if road_x<-1280:
+                    road_x=0
+                    road_time+=1
+                if road_time==10:
+                    road_finish=True
+            else:
+                bg_sp=0
+                road_speed=0
         #Cập nhật toạ độ cho xe
-            if not(player.finish()):
-                player_x+=random.randint(0,max_speed)
-            if not(com1.finish()):
-                com1_x+=random.randint(0,1)
-            if not(com2.finish()):
-                com2_x+=random.randint(0,1)
-            if not(com3.finish()):
-                com3_x+=random.randint(0,1)
-            if not(com4.finish()):
-                com4_x+=random.randint(0,1)
+            if road_finish:
+                if not(player.finish()):
+                    player_x+=random.randint(0,max_speed)
+                    if player_x>1100:
+                        player_x=1100
+                if not(com1.finish()):
+                    com1_x+=random.randint(0,max_com)
+                    if com1_x>1100:
+                        com1_x=1100
+                if not(com2.finish()):
+                    com2_x+=random.randint(0,max_com)
+                    if com2_x>1100:
+                        com2_x=1100
+                if not(com3.finish()):
+                    com3_x+=random.randint(0,max_com)
+                    if com3_x>1100:
+                        com3_x=1100
+                if not(com4.finish()):
+                    com4_x+=random.randint(0,max_com)
+                    if com4_x>1100:
+                        com4_x=1100
+            
             #Đưa item vào
             if not(enough_item): #Nếu chưa đủ 2 item đang xuất hiện
                 #Nếu item 1 chưa xuất hiện
                 if not(item1.exist):
                     lane_item1=random.randint(1,5)
-                    item1_y=100+(lane_item1-1)*140
-                    item1_x=random.randint(min([player_x+100,com4_x+100,com3_x+100,com2_x+100,com1_x+100]),min([player_x+100,com4_x+100,com3_x+100,com2_x+100,com1_x+100])+100)
+                    item1_y=280+(lane_item1-1)*80
+                    item1_x=random.randint(600,1000)
                     if item1_x<end_bg:
                         item1.exist=True
                         num_item+=1
                 #Vẽ item 1
                 if item1.exist:
                     item1.draw(item1_x,item1_y,screen)
+                    item1_x-=road_speed
+                    if item1_x<0:
+                        item1.exist=False
+                        num_item-=1
                     #Xử lý nếu xe chạm vào item
                     if player.is_in(item1_x,item1_y):
                         player_x=item1.affect(player_x)
@@ -237,13 +274,18 @@ def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_st
                 #Tương tự với item 2
                 if not(item2.exist):
                     lane_item2=random.randint(1,5)
-                    item2_y=100+(lane_item2-1)*140
-                    item2_x=random.randint(min([player_x+100,com4_x+100,com3_x+100,com2_x+100,com1_x+100]),min([player_x+100,com4_x+100,com3_x+100,com2_x+100,com1_x+100])+100)
+                    item2_y=280+(lane_item2-1)*80
+                    item2_x=random.randint(600,1000)
                     if item2_x<end_bg and item2_y!=item1_y:
                         item2.exist=True
                         num_item+=1
                 if item2.exist:
                     item2.draw(item2_x,item2_y,screen)
+                    item2_x-=road_speed
+                    if item2_x<0:
+                        item2.exist=False
+                        num_item-=1
+
                     if player.is_in(item2_x-50,item2_y):
                         player_x=item2.affect(player_x)
                         num_item-=1
@@ -286,7 +328,7 @@ def run_game(player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_st
                 com4_rank=rank
                 rank+=1
             #Kết thúc
-            if (player.finish() and com1.finish() and com2.finish() and com3.finish() and com4.finish()):
+            if (player.finish() and com1.finish() and com2.finish() and com3.finish() and com4.finish()) and road_finish:
                 start=False
                 ranked=True
             # bảng xếp hạng
@@ -358,7 +400,6 @@ def main_menu(username):
     start_bt=Buttons(200,100,item_pic,540,570,screen)
     shop_bt=Buttons(100,100,item_pic,50,570,screen)
     buff=(False,False)
-    temp_bt = Buttons(100,100,item_pic,980,570,screen)
     player_name='2'
     running_menu=True
     #Vòng lặp
