@@ -1,6 +1,8 @@
 import pygame, sys, time, random, os
 import tkinter as tk
+import tkinter.messagebox as messagebox
 from pygame.locals import *
+from tkinter import *
 pygame.init()
 pygame.mixer.init()
 pygame.mixer.set_num_channels(10)
@@ -729,43 +731,80 @@ def profile_display(user,screen):
         pygame.display.flip()
 
 def login():
-    username = entry_username.get()
-    password = entry_password.get()
+    # Tạo cửa sổ đăng nhập
+    root = Tk()
+    root.title("Đăng nhập")
 
-    # Kiểm tra thông tin đăng nhập
-    if username == "admin" and password == "password":
-        # Đăng nhập thành công, chuyển màn hình
-        window_login.destroy()  # Đóng màn hình đăng nhập
+    # Tạo các label và entry cho tên đăng nhập và mật khẩu
+    tk.Label(root, text="Tên đăng nhập").grid(row=0, column=0)
+    username_entry = tk.Entry(root)
+    username_entry.grid(row=1, column=0)
 
-        # Tạo màn hình mới sau khi đăng nhập thành công
-        #truyền tạm biến user lấy username để tạo folder lưu ảnh
-        main_menu(username)
+    tk.Label(root, text="Mật khẩu").grid(row=2, column=0)
+    password_entry = tk.Entry(root, show="*")
+    password_entry.grid(row=3, column=0)
 
-        # Thêm các thành phần và chức năng cho màn hình mới ở đây
+    # Tạo hàm kiểm tra tên đăng nhập và mật khẩu    
+    def check_login():
+        # Mở file accounts.txt và đọc tất cả các tài khoản
+        with open("accounts.txt", "r") as f:
+            accounts = f.readlines()
 
-    else:
-        # Đăng nhập không thành công, hiển thị thông báo lỗi
-        label_error.config(text="Thông tin đăng nhập không đúng")
+        # Kiểm tra tên đăng nhập và mật khẩu có trong file accounts.txt hay không
+        for account in accounts:
+            username, password = account.strip().split(":")
+            if username == username_entry.get() and password == password_entry.get():
+            #chuyển màn hình chỗ này
+                root.destroy()        
+                main_menu(username)
+            else:
+                messagebox.showerror("Lỗi", "Tên đăng nhập hoặc mật khẩu không đúng!")
+                
 
-# Tạo màn hình đăng nhập
-window_login = tk.Tk()
+    # Tạo nút đăng nhập và nút thoát
+    tk.Button(root, text="Đăng nhập", command=check_login).grid(row=4, column=0)
 
-# Thêm các thành phần vào màn hình đăng nhập
-label_username = tk.Label(window_login, text="Tên đăng nhập:")
-label_username.pack()
-entry_username = tk.Entry(window_login)
-entry_username.pack()
+    # Chạy chương trình
+    root.mainloop()
 
-label_password = tk.Label(window_login, text="Mật khẩu:")
-label_password.pack()
+def register():
+    root = Tk()
+    root.title("Đăng ký tài khoản")
 
-entry_password = tk.Entry(window_login, show="*")
-entry_password.pack()
+    label_username = Label(root, text="Tên đăng nhập:")
+    label_username.pack()
+    entry_username = Entry(root)
+    entry_username.pack()
 
-button_login = tk.Button(window_login, text="Đăng nhập", command=login)
-button_login.pack()
+    label_password = Label(root, text="Mật khẩu:")
+    label_password.pack()
+    entry_password = Entry(root, show="*")
+    entry_password.pack()
 
-label_error = tk.Label(window_login, text="")
-label_error.pack()
-# Chạy màn hình đăng nhập
-window_login.mainloop()
+    button_register = Button(root, text="Đăng ký")
+    button_login = Button(root, text="Đăng nhập")
+
+    def check_register():
+        username = entry_username.get()
+        password = entry_password.get()
+    # Kiểm tra xem tên đăng nhập và mật khẩu có hợp lệ không
+        if len(username) == 0 or len(password) == 0:
+            messagebox.showerror("Lỗi", "Vui lòng nhập tên đăng nhập và mật khẩu.")
+        else:
+            # Lưu tài khoản vào file accounts.txt
+            with open("accounts.txt", "a") as file:
+                file.write(f"{username}:{password}\n")
+            messagebox.showinfo("Thông báo", "Đăng ký thành công.")
+    button_register.config(command=check_register)
+    button_register.pack()
+    def turn_to_login():
+        root.destroy()
+        login()
+    #khúc này tui tạo button đăng nhập, ông chuyển màn hình khúc này
+    button_login.config(command=turn_to_login)
+    button_login.pack()
+    root.mainloop()
+
+    if __name__ == "__main__":
+        root.mainloop()
+register()
