@@ -1,6 +1,8 @@
 import pygame, sys, time, random, os
 import tkinter as tk
+import tkinter.messagebox as messagebox
 from pygame.locals import *
+from tkinter import *
 pygame.init()
 pygame.mixer.init()
 pygame.mixer.set_num_channels(10)
@@ -39,8 +41,9 @@ item_pic=pygame.image.load(r'MainGame\Image\item.png')
 flash_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\flash.mp3')
 back_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\back.mp3')
 tele_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\teleport.mp3')
+car_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\car_sound.mp3')
 #Nhạc
-
+music1=pygame.mixer.Sound(r'MainGame\Sound\Music\dont-let-me-down-illenium-remix.mp3')
 #Màu
 white=(255,255,255)
 black=(0,0,0)
@@ -147,7 +150,9 @@ class Buttons():
         if x>self.x and x<self.x+self.height and y>self.y and y<self.y+self.width:
             return True
 
-
+class Music():
+    def __init__(self,name,):
+        pass
 
 #Vào đua
 def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_start,user,player_name,screen):
@@ -205,6 +210,7 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
             if event.type==pygame.MOUSEBUTTONDOWN:
                 start=True
         screen.blit(bg,(bg_x,0))
+        screen.blit(bg,(bg_x+1280,0))
         #Vẽ đường
         if road_time==0:
             screen.blit(start_road,(road_x,240))
@@ -230,6 +236,9 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
                     road_time+=1
                 if road_time==10:
                     road_finish=True
+                bg_x-=1
+                if bg_x<-1280:
+                    bg_x=0
             else:
                 road_speed=0
                     
@@ -374,14 +383,11 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
         if check_rank ==False:
             break
     return player_rank
-def shopping(screen,user):
+def shopping(screen,user,buff_speed,buff_start):
     #Khởi tạo nút
-    buy_buff_speed=Buttons(200,100,car_pic1,340,360,screen)
-    buy_better_start=Buttons(200,100,car_pic1,740,360,screen)
+    buy_buff_speed=Buttons(200,100,item_pic,340,360,screen)
+    buy_better_start=Buttons(200,100,item_pic,740,360,screen)
     quit_bt=Buttons(200,100,item_pic,540,570,screen)
-    #Tham số
-    buff_speed=False
-    better_start=False
     #Vòng lặp
     running_shop=True
     while running_shop:
@@ -395,13 +401,15 @@ def shopping(screen,user):
             if event.type==pygame.MOUSEBUTTONDOWN:
                 if buy_buff_speed.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                    if not(buff_speed):
+                        user.money_change(-2000)
                     buff_speed=True
-                    user.money_change(-2000)
                     buy_buff_speed.img=item_pic
                 if buy_better_start.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
-                    better_start=True
-                    user.money_change(-2000)
+                    if not(buff_start):
+                        user.money_change(-2000)
+                    buff_start=True
                     buy_better_start.img=item_pic
                 if quit_bt.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
@@ -414,12 +422,16 @@ def shopping(screen,user):
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
             else:
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+        if buff_speed:
+            buy_buff_speed.img=car_pic1
+        if buff_start:
+            buy_better_start.img=car_pic1
         screen.fill(black)
         buy_better_start.draw()
         buy_buff_speed.draw()
         quit_bt.draw()
         pygame.display.update()
-    return (buff_speed,better_start)
+    return (buff_speed,buff_start)
 
 def pick_map(buff_speed,buff_start,current_user,player_name,char,screen):
     pick_bt=Buttons(200,100,item_pic,540,570,screen)
@@ -436,10 +448,12 @@ def pick_map(buff_speed,buff_start,current_user,player_name,char,screen):
                 new_screen_size = event.dict["size"]
                 screen_resize(new_screen_size)
             if event.type==MOUSEBUTTONDOWN:
+                #Chọn map
                 if pick_bt.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     run_map=False
                     run_game(index,car_pic2,car_pic2,car_pic2,car_pic2,car_pic2,buff_speed,buff_start,current_user,player_name,screen)
+                #Chuyển map muốn chọn
                 if next_bt.is_in(spot[0],spot[1]):
                     index+=1
                     if index>4:
@@ -462,7 +476,7 @@ def pick_map(buff_speed,buff_start,current_user,player_name,char,screen):
         screen.blit(pick_maps[index],(440,210))
         pygame.display.update()
 
-def pick_char(screen):
+def pick_char(screen,username):
     pick1=Buttons(200,200,item_pic,280,160,screen)
     pick2=Buttons(200,200,item_pic,540,160,screen)
     pick3=Buttons(200,200,item_pic,800,160,screen)
@@ -502,6 +516,10 @@ def pick_char(screen):
                         pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                         index=5
                         accept+=1
+                    if return_bt.is_in(spot[0],spot[1]):
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        accept-=1
+                        index=0
                 elif accept==1:
                     if pick1.is_in(spot[0],spot[1]):
                         pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
@@ -576,8 +594,9 @@ def pick_char(screen):
         pick3.draw()
         pick4.draw()
         pick5.draw()
-        if accept==1:
-            return_bt.draw()
+        return_bt.draw()
+        if accept==-1:
+            main_menu(username)
         pygame.display.update()
 
 #Sảnh chờ
@@ -612,7 +631,7 @@ def main_menu(username):
                 if start_bt.is_in(spot[0],spot[1]):
                     running_menu=False
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
-                    char=pick_char(screen)
+                    char=pick_char(screen,username)
                     if char>=0:
                         pick_map(buff[0],buff[1],current_user,player_name,char,screen)
                     running_menu=True
@@ -620,7 +639,7 @@ def main_menu(username):
                     running_menu=False
                     #đổi lại hình dạng chuột ban đầu sau khi click
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
-                    buff=shopping(screen,current_user)
+                    buff=shopping(screen,current_user,buff[0],buff[1])
                     running_menu=True
                 if profile_bt.is_in(spot[0],spot[1]):
                     running_menu=False
@@ -729,43 +748,80 @@ def profile_display(user,screen):
         pygame.display.flip()
 
 def login():
-    username = entry_username.get()
-    password = entry_password.get()
+    # Tạo cửa sổ đăng nhập
+    root = Tk()
+    root.title("Đăng nhập")
 
-    # Kiểm tra thông tin đăng nhập
-    if username == "admin" and password == "password":
-        # Đăng nhập thành công, chuyển màn hình
-        window_login.destroy()  # Đóng màn hình đăng nhập
+    # Tạo các label và entry cho tên đăng nhập và mật khẩu
+    tk.Label(root, text="Tên đăng nhập").grid(row=0, column=0)
+    username_entry = tk.Entry(root)
+    username_entry.grid(row=1, column=0)
 
-        # Tạo màn hình mới sau khi đăng nhập thành công
-        #truyền tạm biến user lấy username để tạo folder lưu ảnh
-        main_menu(username)
+    tk.Label(root, text="Mật khẩu").grid(row=2, column=0)
+    password_entry = tk.Entry(root, show="*")
+    password_entry.grid(row=3, column=0)
 
-        # Thêm các thành phần và chức năng cho màn hình mới ở đây
+    # Tạo hàm kiểm tra tên đăng nhập và mật khẩu    
+    def check_login():
+        # Mở file accounts.txt và đọc tất cả các tài khoản
+        with open("accounts.txt", "r") as f:
+            accounts = f.readlines()
 
-    else:
-        # Đăng nhập không thành công, hiển thị thông báo lỗi
-        label_error.config(text="Thông tin đăng nhập không đúng")
+        # Kiểm tra tên đăng nhập và mật khẩu có trong file accounts.txt hay không
+        for account in accounts:
+            username, password = account.strip().split(":")
+            if username == username_entry.get() and password == password_entry.get():
+            #chuyển màn hình chỗ này
+                root.destroy()        
+                main_menu(username)
+            else:
+                messagebox.showerror("Lỗi", "Tên đăng nhập hoặc mật khẩu không đúng!")
+                
 
-# Tạo màn hình đăng nhập
-window_login = tk.Tk()
+    # Tạo nút đăng nhập và nút thoát
+    tk.Button(root, text="Đăng nhập", command=check_login).grid(row=4, column=0)
 
-# Thêm các thành phần vào màn hình đăng nhập
-label_username = tk.Label(window_login, text="Tên đăng nhập:")
-label_username.pack()
-entry_username = tk.Entry(window_login)
-entry_username.pack()
+    # Chạy chương trình
+    root.mainloop()
 
-label_password = tk.Label(window_login, text="Mật khẩu:")
-label_password.pack()
+def register():
+    root = Tk()
+    root.title("Đăng ký tài khoản")
 
-entry_password = tk.Entry(window_login, show="*")
-entry_password.pack()
+    label_username = Label(root, text="Tên đăng nhập:")
+    label_username.pack()
+    entry_username = Entry(root)
+    entry_username.pack()
 
-button_login = tk.Button(window_login, text="Đăng nhập", command=login)
-button_login.pack()
+    label_password = Label(root, text="Mật khẩu:")
+    label_password.pack()
+    entry_password = Entry(root, show="*")
+    entry_password.pack()
 
-label_error = tk.Label(window_login, text="")
-label_error.pack()
-# Chạy màn hình đăng nhập
-window_login.mainloop()
+    button_register = Button(root, text="Đăng ký")
+    button_login = Button(root, text="Đăng nhập")
+
+    def check_register():
+        username = entry_username.get()
+        password = entry_password.get()
+    # Kiểm tra xem tên đăng nhập và mật khẩu có hợp lệ không
+        if len(username) == 0 or len(password) == 0:
+            messagebox.showerror("Lỗi", "Vui lòng nhập tên đăng nhập và mật khẩu.")
+        else:
+            # Lưu tài khoản vào file accounts.txt
+            with open("accounts.txt", "a") as file:
+                file.write(f"{username}:{password}\n")
+            messagebox.showinfo("Thông báo", "Đăng ký thành công.")
+    button_register.config(command=check_register)
+    button_register.pack()
+    def turn_to_login():
+        root.destroy()
+        login()
+    #khúc này tui tạo button đăng nhập, ông chuyển màn hình khúc này
+    button_login.config(command=turn_to_login)
+    button_login.pack()
+    root.mainloop()
+
+    if __name__ == "__main__":
+        root.mainloop()
+register()
