@@ -41,8 +41,9 @@ item_pic=pygame.image.load(r'MainGame\Image\item.png')
 flash_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\flash.mp3')
 back_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\back.mp3')
 tele_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\teleport.mp3')
+car_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\car_sound.mp3')
 #Nhạc
-
+music1=pygame.mixer.Sound(r'MainGame\Sound\Music\dont-let-me-down-illenium-remix.mp3')
 #Màu
 white=(255,255,255)
 black=(0,0,0)
@@ -149,7 +150,9 @@ class Buttons():
         if x>self.x and x<self.x+self.height and y>self.y and y<self.y+self.width:
             return True
 
-
+class Music():
+    def __init__(self,name,):
+        pass
 
 #Vào đua
 def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_start,user,player_name,screen):
@@ -207,6 +210,7 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
             if event.type==pygame.MOUSEBUTTONDOWN:
                 start=True
         screen.blit(bg,(bg_x,0))
+        screen.blit(bg,(bg_x+1280,0))
         #Vẽ đường
         if road_time==0:
             screen.blit(start_road,(road_x,240))
@@ -232,6 +236,9 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
                     road_time+=1
                 if road_time==10:
                     road_finish=True
+                bg_x-=1
+                if bg_x<-1280:
+                    bg_x=0
             else:
                 road_speed=0
                     
@@ -376,14 +383,11 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
         if check_rank ==False:
             break
     return player_rank
-def shopping(screen,user):
+def shopping(screen,user,buff_speed,buff_start):
     #Khởi tạo nút
-    buy_buff_speed=Buttons(200,100,car_pic1,340,360,screen)
-    buy_better_start=Buttons(200,100,car_pic1,740,360,screen)
+    buy_buff_speed=Buttons(200,100,item_pic,340,360,screen)
+    buy_better_start=Buttons(200,100,item_pic,740,360,screen)
     quit_bt=Buttons(200,100,item_pic,540,570,screen)
-    #Tham số
-    buff_speed=False
-    better_start=False
     #Vòng lặp
     running_shop=True
     while running_shop:
@@ -397,13 +401,15 @@ def shopping(screen,user):
             if event.type==pygame.MOUSEBUTTONDOWN:
                 if buy_buff_speed.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                    if not(buff_speed):
+                        user.money_change(-2000)
                     buff_speed=True
-                    user.money_change(-2000)
                     buy_buff_speed.img=item_pic
                 if buy_better_start.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
-                    better_start=True
-                    user.money_change(-2000)
+                    if not(buff_start):
+                        user.money_change(-2000)
+                    buff_start=True
                     buy_better_start.img=item_pic
                 if quit_bt.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
@@ -416,12 +422,16 @@ def shopping(screen,user):
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
             else:
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+        if buff_speed:
+            buy_buff_speed.img=car_pic1
+        if buff_start:
+            buy_better_start.img=car_pic1
         screen.fill(black)
         buy_better_start.draw()
         buy_buff_speed.draw()
         quit_bt.draw()
         pygame.display.update()
-    return (buff_speed,better_start)
+    return (buff_speed,buff_start)
 
 def pick_map(buff_speed,buff_start,current_user,player_name,char,screen):
     pick_bt=Buttons(200,100,item_pic,540,570,screen)
@@ -438,10 +448,12 @@ def pick_map(buff_speed,buff_start,current_user,player_name,char,screen):
                 new_screen_size = event.dict["size"]
                 screen_resize(new_screen_size)
             if event.type==MOUSEBUTTONDOWN:
+                #Chọn map
                 if pick_bt.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     run_map=False
                     run_game(index,car_pic2,car_pic2,car_pic2,car_pic2,car_pic2,buff_speed,buff_start,current_user,player_name,screen)
+                #Chuyển map muốn chọn
                 if next_bt.is_in(spot[0],spot[1]):
                     index+=1
                     if index>4:
@@ -464,7 +476,7 @@ def pick_map(buff_speed,buff_start,current_user,player_name,char,screen):
         screen.blit(pick_maps[index],(440,210))
         pygame.display.update()
 
-def pick_char(screen):
+def pick_char(screen,username):
     pick1=Buttons(200,200,item_pic,280,160,screen)
     pick2=Buttons(200,200,item_pic,540,160,screen)
     pick3=Buttons(200,200,item_pic,800,160,screen)
@@ -504,6 +516,10 @@ def pick_char(screen):
                         pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                         index=5
                         accept+=1
+                    if return_bt.is_in(spot[0],spot[1]):
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        accept-=1
+                        index=0
                 elif accept==1:
                     if pick1.is_in(spot[0],spot[1]):
                         pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
@@ -578,8 +594,9 @@ def pick_char(screen):
         pick3.draw()
         pick4.draw()
         pick5.draw()
-        if accept==1:
-            return_bt.draw()
+        return_bt.draw()
+        if accept==-1:
+            main_menu(username)
         pygame.display.update()
 
 #Sảnh chờ
@@ -614,7 +631,7 @@ def main_menu(username):
                 if start_bt.is_in(spot[0],spot[1]):
                     running_menu=False
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
-                    char=pick_char(screen)
+                    char=pick_char(screen,username)
                     if char>=0:
                         pick_map(buff[0],buff[1],current_user,player_name,char,screen)
                     running_menu=True
@@ -622,7 +639,7 @@ def main_menu(username):
                     running_menu=False
                     #đổi lại hình dạng chuột ban đầu sau khi click
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
-                    buff=shopping(screen,current_user)
+                    buff=shopping(screen,current_user,buff[0],buff[1])
                     running_menu=True
                 if profile_bt.is_in(spot[0],spot[1]):
                     running_menu=False
