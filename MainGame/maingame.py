@@ -555,7 +555,7 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
                 ranked=True
             # bảng xếp hạng
         if ranked:
-            check_rank = ranked_rs(r'MainGame\Image\item.png',screen_size[0]/2,4*screen_size[1]/5,player,com1,com2,com3,com4,user,screen)
+            check_rank = ranked_rs(r'MainGame\Image\bxh.jpg',screen_size[0]/2,4*screen_size[1]/5,player,com1,com2,com3,com4,user,screen)
 
         pygame.display.update()
         
@@ -808,6 +808,9 @@ def main_menu(username):
     is_play=False
     stop=False
 
+    #Thời gian hiện chữ
+    time=0
+
     #Tham số của người chơi
     buff=(False,False)
     char=-1
@@ -815,6 +818,7 @@ def main_menu(username):
     running_menu=True
     #Vòng lặp
     while running_menu:
+        fpsClock.tick(FPS)
         #Lấy tọa độ chuột
         spot = pygame.mouse.get_pos()
         for event in pygame.event.get():
@@ -828,6 +832,7 @@ def main_menu(username):
                 #Xử lý thao tác trên các nút
                 #Nút vào game
                 if start_bt.is_in(spot[0],spot[1]):
+                    time = 0
                     running_menu=False
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     char=pick_char(screen,username)
@@ -836,6 +841,7 @@ def main_menu(username):
                     running_menu=True
                 #Nút shop
                 if shop_bt.is_in(spot[0],spot[1]):
+                    time = 0
                     running_menu=False
                     #đổi lại hình dạng chuột ban đầu sau khi click
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
@@ -843,17 +849,23 @@ def main_menu(username):
                     running_menu=True
                 #Nút show profile
                 if profile_bt.is_in(spot[0],spot[1]):
+                    time = 0
                     running_menu=False
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     profile_display(current_user,screen)
                     running_menu=True
                 #Nút minigame
                 if minigame_bt.is_in(spot[0],spot[1]):
-                    running_menu=False
-                    pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
-                    score=snakeGame(screen)
-                    current_user.money_change(score*100)
-                    running_menu=True
+                    if current_user.money<=2000:
+                        time = 0
+                        running_menu=False
+                        pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                        score=snakeGame(screen)
+                        current_user.money_change(score*100)
+                        running_menu=True
+                    else:
+                        draw_text("Khi dưới 2000 vàng mới được chơi minigame!", ms_font, white, screen, 640,360)
+                        time = 240
                 #Nút chuyển nhạc
                 if next_music_bt.is_in(spot[0],spot[1]):
                     ms_index+=1
@@ -890,7 +902,10 @@ def main_menu(username):
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
             else:
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
-        screen.fill(black)
+        if time <= 0:
+            screen.fill(black)
+        else:
+            time-=1
         #Vẽ nút
         profile_bt.draw()
         shop_bt.draw()
@@ -908,8 +923,10 @@ def main_menu(username):
         pygame.display.update()
 
 def ranked_rs(image,width,height,player,com1,com2,com3,com4,user,screen):
-    rank_img = pygame.transform.scale(pygame.image.load(image),(width,height))
-    rank_rect = rank_img.get_rect(topleft=(screen_size[0]/4,screen_size[1]/10))
+    rank_surface = pygame.Surface((25 * screen_size[0]/ 64 ,55 * screen_size[1]/ 72))
+    rank_surface.fill((255, 0, 0))
+    rank_img = pygame.transform.scale(pygame.image.load(image),(25 * screen_size[0]/ 64 ,55 * screen_size[1]/ 72))
+    rank_rect = rank_img.get_rect(topleft=(0,0))
     running_rank = True
     home_bt = Buttons(screen_size[0]/16,screen_size[1]/8,item_pic,screen_size[0]/4,9*screen_size[1]/10,screen)
     save_bt = Buttons(screen_size[0]/16,screen_size[1]/8,item_pic,3*screen_size[0]/4,9*screen_size[1]/10,screen)
@@ -935,7 +952,6 @@ def ranked_rs(image,width,height,player,com1,com2,com3,com4,user,screen):
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 pygame.quit()
-                sys.exit()
             if event.type == pygame.VIDEORESIZE:
                 new_screen_size = event.dict["size"]
                 screen_resize(new_screen_size)
@@ -952,21 +968,22 @@ def ranked_rs(image,width,height,player,com1,com2,com3,com4,user,screen):
             else :
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
 
-
-        screen.blit(rank_img,rank_rect)
+        screen.blit(rank_surface,((screen_size[0] - 25 * screen_size[0]/ 64) / 2,(screen_size[1] - 55 * screen_size[1]/ 72) / 2))
+        rank_surface.blit(rank_img, rank_rect)
         #vẽ nút
         home_bt.draw()
         save_bt.draw()
-        draw_text('1',new_font,black,screen,screen_size[0]/4+screen_size[0]/40,3*screen_size[1]/20)
-        draw_text('2',new_font,black,screen,screen_size[0]/4+screen_size[0]/40,6*screen_size[1]/20)
-        draw_text('3',new_font,black,screen,screen_size[0]/4+screen_size[0]/40,9*screen_size[1]/20)
-        draw_text('4',new_font,black,screen,screen_size[0]/4+screen_size[0]/40,12*screen_size[1]/20)
-        draw_text('5',new_font,black,screen,screen_size[0]/4+screen_size[0]/40,15*screen_size[1]/20)
-        draw_text(lt[0].name,new_font,lt[0].color,screen,screen_size[0]/4+screen_size[0]/5,3*screen_size[1]/20)
-        draw_text(lt[1].name,new_font,lt[1].color,screen,screen_size[0]/4+screen_size[0]/5,6*screen_size[1]/20)
-        draw_text(lt[2].name,new_font,lt[2].color,screen,screen_size[0]/4+screen_size[0]/5,9*screen_size[1]/20)
-        draw_text(lt[3].name,new_font,lt[3].color,screen,screen_size[0]/4+screen_size[0]/5,12*screen_size[1]/20)
-        draw_text(lt[4].name,new_font,lt[4].color,screen,screen_size[0]/4+screen_size[0]/5,15*screen_size[1]/20)
+        draw_text('1',new_font,black,rank_surface,screen_size[0]/16,17*screen_size[1]/72)
+        draw_text('2',new_font,black,rank_surface,screen_size[0]/16,25*screen_size[1]/72)
+        draw_text('3',new_font,black,rank_surface,screen_size[0]/16,33*screen_size[1]/72)
+        draw_text('4',new_font,black,rank_surface,screen_size[0]/16,41*screen_size[1]/72)
+        draw_text('5',new_font,black,rank_surface,screen_size[0]/16,49*screen_size[1]/72)
+
+        draw_text(lt[0].name,new_font,lt[0].color,rank_surface,screen_size[0]/4,17*screen_size[1]/72)
+        draw_text(lt[1].name,new_font,lt[1].color,rank_surface,screen_size[0]/4,25*screen_size[1]/72)
+        draw_text(lt[2].name,new_font,lt[2].color,rank_surface,screen_size[0]/4,33*screen_size[1]/72)
+        draw_text(lt[3].name,new_font,lt[3].color,rank_surface,screen_size[0]/4,41*screen_size[1]/72)
+        draw_text(lt[4].name,new_font,lt[4].color,rank_surface,screen_size[0]/4,49*screen_size[1]/72)
         pygame.display.flip()
     return False
 
