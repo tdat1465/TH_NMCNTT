@@ -59,6 +59,8 @@ current_money=20000
 font = pygame.font.SysFont("Consolas", 50, bold=True, italic=False)
 new_font = pygame.font.SysFont("Consolas", 30, bold=True, italic=False)
 ms_font=pygame.font.SysFont("Consolas", 20, bold=True, italic=False)
+name_font=pygame.font.SysFont("Consolas", 30, bold=False, italic=False)
+history_font=pygame.font.SysFont("Consolas", 20, bold=False, italic=False)
 
 #Hàm
 #Vẽ chữ
@@ -78,6 +80,7 @@ class User():
         self.username=username
         #Tạo đường dẫn
         self.path='MainGame/'+self.username+'_history'
+        self.file_list = os.listdir(self.path)
     def create_player_history(self):#tạo một lần duy nhất cho 1 user
         if os.path.exists(self.path) == False:
             os.mkdir(self.path)
@@ -85,6 +88,11 @@ class User():
         self.image_file = self.path + '/history'+str(self.htr_in)+'.png'
         pygame.image.save(screen,self.image_file)
         self.htr_in +=1
+    def get_file_name(self,index):
+        name = ''
+        if index < len(self.file_list):
+            name = self.file_list[index][:-4]
+        return name
     def money_update(self,player):
         if player.rank == 1:
             self.money += 5000
@@ -614,6 +622,64 @@ def shopping(screen,user,buff_speed,buff_start):
         pygame.display.update()
     return (buff_speed,buff_start)
 
+def set_name(screen):
+    sname=""
+    count = 0
+    name=True
+    type_name =False
+    name_gap = Buttons(19*screen_size[0]/40,screen_size[1]/12,item_pic,screen_size[0]/4,screen_size[1]/4,screen)
+    accept_bt = Buttons(screen_size[1]/12,screen_size[1]/12,item_pic,29*screen_size[0]/40,screen_size[1]/4,screen)
+    while name:
+        count +=1
+        if (count // 150) % 2 == 0:
+            name_dis = sname + '_'
+        else:
+            name_dis = sname
+        spot = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.VIDEORESIZE:
+                new_screen_size = event.dict["size"]
+                screen_resize(new_screen_size)
+            if event.type==MOUSEBUTTONDOWN:
+                if accept_bt.is_in(spot[0],spot[1]):
+                    pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                    name = False
+                    return sname
+                if name_gap.is_in(spot[0],spot[1]):
+                    type_name = True
+            if type_name == True and event.type == KEYDOWN:
+                if event.key == K_BACKSPACE:
+                    sname = sname[:-1]
+                elif event.key == K_RETURN:
+                    name = False
+                    return sname
+                else:
+                    sname += event.unicode
+            if name_gap.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_IBEAM)
+            elif accept_bt.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+        screen.fill(black)
+        name_gap.draw()
+        screen.fill(white,name_gap.rect)
+        accept_bt.draw()
+        if type_name:
+            text_obj = font.render(name_dis,1,black)
+            text_rect = text_obj.get_rect(topleft = (screen_size[0]/4,screen_size[1]/4))
+            screen.blit(text_obj,text_rect)
+        else:
+            text_obj = font.render('Enter car\'s name here',1,(190,190,190))
+            text_rect = text_obj.get_rect(topleft = (screen_size[0]/4,screen_size[1]/4))
+            screen.blit(text_obj,text_rect)
+        pygame.display.flip()
+        pygame.display.update()
+
+
+
 def pick_map(buff_speed,buff_start,current_user,player_name,char,screen):
     pick_bt=Buttons(200,100,item_pic,540,570,screen)
     next_bt=Buttons(100,100,item_pic,980,340,screen)
@@ -836,6 +902,7 @@ def main_menu(username):
                     running_menu=False
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     char=pick_char(screen,username)
+                    player_name = set_name(screen)
                     if char>=0:
                         pick_map(buff[0],buff[1],current_user,player_name,char,screen)
                     running_menu=True
@@ -987,28 +1054,145 @@ def ranked_rs(image,width,height,player,com1,com2,com3,com4,user,screen):
         pygame.display.flip()
     return False
 
-def profile_display(user,screen):
+
+
+def History(user,display,page,screen):
     run = True
+    hrt_surf = pygame.transform.scale(pygame.image.load(user.path+'/'+user.file_list[display+page*5]),(screen_size[0],screen_size[1]))
+    hrt_rect = hrt_surf.get_rect(topleft=(0,0))
     return_bt = Buttons(screen_size[0]/24,screen_size[0]/24,item_pic,23*screen_size[0]/24,screen_size[1]-screen_size[0]/24,screen)
     while run:
         spot=pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit
+            if event.type == pygame.VIDEORESIZE:
+                new_screen_size = event.dict["size"]
+                screen_resize(new_screen_size)
             if event.type == MOUSEBUTTONDOWN:
                 if return_bt.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     run = False
+            if return_bt.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            else:
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+        screen.blit(hrt_surf,hrt_rect)
+        return_bt.draw()
+        pygame.display.flip()
+
+
+
+
+def profile_display(user,screen):
+    run = True
+    page = 0
+    display = -1
+    max_dis = len(user.file_list) % 5 -1
+    return_bt = Buttons(screen_size[0]/24,screen_size[0]/24,item_pic,23*screen_size[0]/24,screen_size[1]-screen_size[0]/24,screen)
+    next_bt = Buttons(screen_size[0]/24,screen_size[0]/24,item_pic,3*screen_size[0]/4,8*screen_size[1]/9,screen)
+    back_bt = Buttons(screen_size[0]/24,screen_size[0]/24,item_pic,screen_size[0]/4,8*screen_size[1]/9,screen)
+    History1_bt = Buttons(screen_size[0],screen_size[1]/10,item_pic,0,3*screen_size[1]/9,screen)
+    History2_bt = Buttons(screen_size[0],screen_size[1]/10,item_pic,0,4*screen_size[1]/9,screen)
+    History3_bt = Buttons(screen_size[0],screen_size[1]/10,item_pic,0,5*screen_size[1]/9,screen)
+    History4_bt = Buttons(screen_size[0],screen_size[1]/10,item_pic,0,6*screen_size[1]/9,screen)
+    History5_bt = Buttons(screen_size[0],screen_size[1]/10,item_pic,0,7*screen_size[1]/9,screen)
+    lists = ['','','','','']
+    color = [black,black,black,black,black]
+    while run:
+        if len(user.file_list) % 5 != 0:
+            max_page = len(user.file_list) // 5 + 1
+        else :
+            max_page = len(user.file_list) // 5 
+        for i in range(5):
+            lists[i] = user.get_file_name(i+page*5)
+        spot=pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit
+            if event.type == pygame.VIDEORESIZE:
+                new_screen_size = event.dict["size"]
+                screen_resize(new_screen_size)
+            if event.type == MOUSEBUTTONDOWN:
+                if return_bt.is_in(spot[0],spot[1]):
+                    pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+                    run = False
+                if next_bt.is_in(spot[0],spot[1]):
+                    if page < max_page-1:
+                        page += 1
+                if back_bt.is_in(spot[0],spot[1]):
+                    if page >= 1:
+                        page -= 1
+                if History1_bt.is_in(spot[0],spot[1]) and (page != max_page-1 or (page == max_page-1 and max_dis >= 0)):
+                    display = 0
+                if History2_bt.is_in(spot[0],spot[1]) and (page != max_page-1 or (page == max_page-1 and max_dis >= 1)):
+                    display = 1
+                if History3_bt.is_in(spot[0],spot[1]) and (page != max_page-1 or (page == max_page-1 and max_dis >= 2)):
+                    display = 2
+                if History4_bt.is_in(spot[0],spot[1]) and (page != max_page-1 or (page == max_page-1 and max_dis >= 3)):
+                    display = 3
+                if History5_bt.is_in(spot[0],spot[1]) and (page != max_page-1 or (page == max_page-1 and max_dis >= 4)):
+                    display = 4
+                if display >= 0:
+                    History(user,display,page,screen)
+                    display = -1
         if return_bt.is_in(spot[0],spot[1]):
             pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+        elif next_bt.is_in(spot[0],spot[1]):
+            pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+        elif back_bt.is_in(spot[0],spot[1]):
+            pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+        elif History1_bt.is_in(spot[0],spot[1])  and (page != max_page-1 or (page == max_page-1 and max_dis >= 0)):
+            pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            color[0] = (0,255,0)
+        elif History2_bt.is_in(spot[0],spot[1]) and (page != max_page-1 or (page == max_page-1 and max_dis >= 1)):
+            pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            color[1] = (0,255,0)
+        elif History3_bt.is_in(spot[0],spot[1]) and (page != max_page-1 or (page == max_page-1 and max_dis >= 2)):
+            pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            color[2] = (0,255,0)
+        elif History4_bt.is_in(spot[0],spot[1]) and (page != max_page-1 or (page == max_page-1 and max_dis >= 3)):
+            pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            color[3] = (0,255,0)
+        elif History5_bt.is_in(spot[0],spot[1]) and (page != max_page-1 or (page == max_page-1 and max_dis >= 4)):
+            pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            color[4] = (0,255,0)
         else:
             pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+        if not(History1_bt.is_in(spot[0],spot[1])):
+            color[0] = (0,0,0)
+        if not(History2_bt.is_in(spot[0],spot[1])):
+            color[1] = (0,0,0)
+        if not(History3_bt.is_in(spot[0],spot[1])):
+            color[2] = (0,0,0)
+        if not(History4_bt.is_in(spot[0],spot[1])):
+            color[3] = (0,0,0)
+        if not(History5_bt.is_in(spot[0],spot[1])):
+            color[4] = (0,0,0)
     #vẽ màn hình, nút
-        screen.fill((0,0,0))
+        screen.fill((220,220,220))
         return_bt.draw()
-        draw_text('username:'+user.username,font,white,screen,screen_size[0]/4,screen_size[1]/4)
-        draw_text('Money:'+str(user.money),font,white,screen,screen_size[0]/4,screen_size[1]/3)
+        next_bt.draw()
+        back_bt.draw()
+        History1_bt.draw()
+        History2_bt.draw()
+        History3_bt.draw()
+        History4_bt.draw()
+        History5_bt.draw()
+        screen.fill(white,History1_bt.rect)
+        screen.fill(white,History2_bt.rect)
+        screen.fill(white,History3_bt.rect)
+        screen.fill(white,History4_bt.rect)
+        screen.fill(white,History5_bt.rect)
+        draw_text(lists[0],history_font,color[0],screen,History1_bt.x+History1_bt.height/2,History1_bt.y+History1_bt.width/2)
+        draw_text(lists[1],history_font,color[1],screen,History2_bt.x+History2_bt.height/2,History2_bt.y+History2_bt.width/2)
+        draw_text(lists[2],history_font,color[2],screen,History3_bt.x+History3_bt.height/2,History3_bt.y+History3_bt.width/2)
+        draw_text(lists[3],history_font,color[3],screen,History4_bt.x+History4_bt.height/2,History4_bt.y+History4_bt.width/2)
+        draw_text(lists[4],history_font,color[4],screen,History5_bt.x+History5_bt.height/2,History5_bt.y+History5_bt.width/2)
+        draw_text(str(page+1),name_font,black,screen,screen_size[0]/2,9*screen_size[1]/10)
+        draw_text('username:'+user.username,name_font,black,screen,screen_size[0]/4,screen_size[1]/12)
+        draw_text('Money:'+str(user.money),name_font,black,screen,screen_size[0]/4,screen_size[1]/6)
         pygame.display.flip()
 
 def login():
