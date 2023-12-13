@@ -13,12 +13,26 @@ fpsClock = pygame.time.Clock()
 screen_size=(1280,720)
 
 #Thêm background
-bg=pygame.transform.scale(pygame.image.load(r'MainGame\Image\bg3.jpg'),screen_size)
+bg=pygame.transform.scale(pygame.image.load(r'MainGame\Image\background.jpg'),screen_size)
 road=pygame.transform.scale(pygame.image.load(r'MainGame\Image\road.jpg'),(1280,400))
 start_road=pygame.transform.scale(pygame.image.load(r'MainGame\Image\start_road.jpg'),(1280,400))
 finish_road=pygame.transform.scale(pygame.image.load(r'MainGame\Image\finish_road.jpg'),(1280,400))
 end_bg=1000
 start_bg=200
+
+#Load ảnh nút
+back_ms_bt_img=pygame.image.load(r'MainGame\Image\back_ms_bt.jpg')
+next_ms_bt_img=pygame.image.load(r'MainGame\Image\next_ms_bt.jpg')
+play_bt_img=pygame.image.load(r'MainGame\Image\start_bt.jpg')
+dis_ms_bt_img=pygame.image.load(r'MainGame\Image\disable_ms_bt.jpg')
+en_ms_bt_img=pygame.image.load(r'MainGame\Image\enable_ms_bt.jpg')
+help_bt_img=pygame.image.load(r'MainGame\Image\help_bt.jpg')
+profile_bt_img=pygame.image.load(r'MainGame\Image\profile_bt.jpg')
+save_bt_img=pygame.image.load(r'MainGame\Image\save_bt.jpg')
+shop_bt_img=pygame.image.load(r'MainGame\Image\shop_bt.jpg')
+return_bt_img=pygame.image.load(r'MainGame\Image\back_bt.jpg')
+minigame_bt_img=pygame.image.load(r'MainGame\Image\minigame_bt.jpg')
+
 #Maps
 map1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\bg1.jpg'),(1280,720))
 map2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\bg2.jpg'),(1280,720))
@@ -575,7 +589,7 @@ def shopping(screen,user,buff_speed,buff_start):
     #Khởi tạo nút
     buy_buff_speed=Buttons(200,100,item_pic,340,360,screen)
     buy_better_start=Buttons(200,100,buff_start_img,740,360,screen)
-    quit_bt=Buttons(200,100,item_pic,540,570,screen)
+    quit_bt=Buttons(200,100,return_bt_img,540,570,screen)
     #Vòng lặp
     running_shop=True
     while running_shop:
@@ -615,7 +629,7 @@ def shopping(screen,user,buff_speed,buff_start):
             buy_buff_speed.img=car_pic1
         if buff_start:
             buy_better_start.img=pygame.transform.scale(buff_start_ed_img,(200,100))
-        screen.fill(black)
+        screen.blit(bg,(0,0))
         buy_better_start.draw()
         buy_buff_speed.draw()
         quit_bt.draw()
@@ -663,7 +677,7 @@ def set_name(screen):
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
             else:
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
-        screen.fill(black)
+        screen.blit(bg,(0,0))
         name_gap.draw()
         screen.fill(white,name_gap.rect)
         accept_bt.draw()
@@ -718,6 +732,7 @@ def pick_map(buff_speed,buff_start,current_user,player_name,char,screen):
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
             else:
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
+        screen.blit(bg,(0,0))
         pick_bt.draw()
         next_bt.draw()
         back_bt.draw()
@@ -730,7 +745,7 @@ def pick_char(screen,username):
     pick3=Buttons(200,200,item_pic,800,160,screen)
     pick4=Buttons(200,200,item_pic,410,400,screen)
     pick5=Buttons(200,200,item_pic,670,400,screen)
-    return_bt=Buttons(150,150,item_pic,0,0,screen)
+    return_bt=Buttons(150,150,return_bt_img,0,0,screen)
     accept=0
     index=0
     run_map=True
@@ -840,7 +855,7 @@ def pick_char(screen,username):
             pick3.img=car_pic1
             pick4.img=car_pic1
             pick5.img=car_pic1
-        screen.fill(black)
+        screen.blit(bg,(0,0))
         pick1.draw()
         pick2.draw()
         pick3.draw()
@@ -861,13 +876,13 @@ def main_menu(username):
     pygame.display.set_icon(icon)
 
     #Khởi tạo nút
-    profile_bt = Buttons(200,100,item_pic,20,20,screen)
+    profile_bt = Buttons(200,100,profile_bt_img,20,20,screen)
     start_bt=Buttons(200,100,start_bt_img,540,570,screen)
-    shop_bt=Buttons(100,100,item_pic,50,570,screen)
-    minigame_bt=Buttons(100,100,item_pic,50,310,screen)
-    next_music_bt=Buttons(30,30,item_pic,1000,100,screen)
-    back_music_bt=Buttons(30,30,item_pic,1050,100,screen)
-    stop_music_bt=Buttons(30,30,item_pic,940,100,screen)
+    shop_bt=Buttons(100,100,shop_bt_img,50,570,screen)
+    minigame_bt=Buttons(100,100,minigame_bt_img,50,310,screen)
+    next_music_bt=Buttons(30,30,next_ms_bt_img,1050,100,screen)
+    back_music_bt=Buttons(30,30,back_ms_bt_img,1000,100,screen)
+    stop_music_bt=Buttons(30,30,dis_ms_bt_img,940,100,screen)
 
     #Nhạc
     ms_index=0
@@ -945,9 +960,11 @@ def main_menu(username):
                     if ms_index<0:
                         ms_index=len(musics)-1
                 if stop_music_bt.is_in(spot[0],spot[1]) and not(stop):
+                    stop_music_bt.img=pygame.transform.scale(en_ms_bt_img,(30,30))
                     musics[ms_index].stop()
                     stop=True
                 elif stop_music_bt.is_in(spot[0],spot[1]) and stop:
+                    stop_music_bt.img=pygame.transform.scale(dis_ms_bt_img,(30,30))
                     musics[ms_index].play()
                     stop=False
 
@@ -970,7 +987,7 @@ def main_menu(username):
             else:
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
         if time <= 0:
-            screen.fill(black)
+            screen.blit(bg,(0,0))
         else:
             time-=1
         #Vẽ nút
@@ -995,8 +1012,8 @@ def ranked_rs(image,width,height,player,com1,com2,com3,com4,user,screen):
     rank_img = pygame.transform.scale(pygame.image.load(image),(25 * screen_size[0]/ 64 ,55 * screen_size[1]/ 72))
     rank_rect = rank_img.get_rect(topleft=(0,0))
     running_rank = True
-    home_bt = Buttons(screen_size[0]/16,screen_size[1]/8,item_pic,screen_size[0]/4,9*screen_size[1]/10,screen)
-    save_bt = Buttons(screen_size[0]/16,screen_size[1]/8,item_pic,3*screen_size[0]/4,9*screen_size[1]/10,screen)
+    home_bt = Buttons(screen_size[0]/16,screen_size[1]/8,return_bt_img,screen_size[0]/4,9*screen_size[1]/10,screen)
+    save_bt = Buttons(screen_size[0]/16,screen_size[1]/8,save_bt_img,3*screen_size[0]/4,9*screen_size[1]/10,screen)
     lt = [player,com1,com2,com3,com4]
     #Cập nhật tiền 
     user.money_update(player)
@@ -1060,7 +1077,7 @@ def History(user,display,page,screen):
     run = True
     hrt_surf = pygame.transform.scale(pygame.image.load(user.path+'/'+user.file_list[display+page*5]),(screen_size[0],screen_size[1]))
     hrt_rect = hrt_surf.get_rect(topleft=(0,0))
-    return_bt = Buttons(screen_size[0]/24,screen_size[0]/24,item_pic,23*screen_size[0]/24,screen_size[1]-screen_size[0]/24,screen)
+    return_bt = Buttons(screen_size[0]/24,screen_size[0]/24,return_bt_img,23*screen_size[0]/24,screen_size[1]-screen_size[0]/24,screen)
     while run:
         spot=pygame.mouse.get_pos()
         for event in pygame.event.get():
@@ -1089,9 +1106,9 @@ def profile_display(user,screen):
     page = 0
     display = -1
     max_dis = len(user.file_list) % 5 -1
-    return_bt = Buttons(screen_size[0]/24,screen_size[0]/24,item_pic,23*screen_size[0]/24,screen_size[1]-screen_size[0]/24,screen)
-    next_bt = Buttons(screen_size[0]/24,screen_size[0]/24,item_pic,3*screen_size[0]/4,8*screen_size[1]/9,screen)
-    back_bt = Buttons(screen_size[0]/24,screen_size[0]/24,item_pic,screen_size[0]/4,8*screen_size[1]/9,screen)
+    return_bt = Buttons(screen_size[0]/24,screen_size[0]/24,return_bt_img,23*screen_size[0]/24,screen_size[1]-screen_size[0]/24,screen)
+    next_bt = Buttons(screen_size[0]/24,screen_size[0]/24,next_ms_bt_img,3*screen_size[0]/4,8*screen_size[1]/9,screen)
+    back_bt = Buttons(screen_size[0]/24,screen_size[0]/24,back_ms_bt_img,screen_size[0]/4,8*screen_size[1]/9,screen)
     History1_bt = Buttons(screen_size[0],screen_size[1]/10,item_pic,0,3*screen_size[1]/9,screen)
     History2_bt = Buttons(screen_size[0],screen_size[1]/10,item_pic,0,4*screen_size[1]/9,screen)
     History3_bt = Buttons(screen_size[0],screen_size[1]/10,item_pic,0,5*screen_size[1]/9,screen)
