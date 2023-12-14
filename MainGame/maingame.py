@@ -56,6 +56,8 @@ item_pic=pygame.image.load(r'MainGame\Image\item.jpg')
 start_bt_img=pygame.image.load(r'MainGame\Image\start_bt.jpg')
 buff_start_img=pygame.image.load(r'MainGame\Image\startbuff.jpg')
 buff_start_ed_img=pygame.image.load(r'MainGame\Image\start_buff.jpg')
+buff_gold_img=pygame.image.load(r'MainGame\Image\goldbuff.jpg')
+buff_gold_ed_img=pygame.image.load(r'MainGame\Image\gold_buff.jpg')
 
 #Thêm âm thanh
 flash_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\flash.mp3')
@@ -75,7 +77,7 @@ new_font = pygame.font.SysFont("Consolas", 30, bold=True, italic=False)
 ms_font=pygame.font.SysFont("Consolas", 20, bold=True, italic=False)
 name_font=pygame.font.SysFont("Consolas", 30, bold=False, italic=False)
 history_font=pygame.font.SysFont("Consolas", 20, bold=False, italic=False)
-
+time_font=pygame.font.SysFont("Consolas", 200, bold=False, italic=False)
 #Hàm
 #Vẽ chữ
 def draw_text(text, font, color, surface, x, y):
@@ -107,22 +109,30 @@ class User():
         if index < len(self.file_list):
             name = self.file_list[index][:-4]
         return name
-    def money_update(self,player):
+    def money_update(self,player,buff_gold):
         if player.rank == 1:
-            self.money += 5000
+            if buff_gold:
+                self.money += 10000
+            else:
+                self.money += 5000
         if player.rank == 2:
-            self.money += 2000
+            if buff_gold:
+                self.money += 2000
+            else:
+                self.money += 1000
         else:
-            self.money -= 1000
+            if buff_gold:
+                self.money-=4000
+            else:
+                self.money -= 2000
     def money_change(self,dif):
         self.money+=dif
 class Car():
     name=''
     color=(0,0,0)
-    def __init__(self,screen,image,lane,buff_speed=False,better_start=False):
+    def __init__(self,screen,image,lane,better_start=False):
         self.image=image
         self.y=280+(lane-1)*80
-        self.buff_speed=buff_speed
         self.better_start=better_start
         self.screen=screen
     def draw(self,x,rank):
@@ -333,29 +343,28 @@ def snakeGame(gameSurface):
 
 
 #Vào đua
-def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed,better_start,user,player_name,screen):
+def run_game(map_index,skill,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_gold,better_start,user,player_name,screen):
     #Phát âm thanh
     pygame.mixer.Channel(3).play(car_sound,-1)
     #Khởi tạo xe 
-    player=Car(screen,player_pic,2,buff_speed,better_start)
+    player=Car(screen,player_pic,3,better_start)
     com1=Car(screen,com1_pic,1)
-    com2=Car(screen,com2_pic,3)
+    com2=Car(screen,com2_pic,2)
     com3=Car(screen,com3_pic,4)
     com4=Car(screen,com4_pic,5)
 
     #Set tên
     player.name = player_name
-    com1.name = 'com'
-    com2.name ='com'
-    com3.name ='com'
-    com4.name ='com'
+    com1.name = 'com1'
+    com2.name ='com2'
+    com3.name ='com3'
+    com4.name ='com4'
     
     #Map
     bg=maps[map_index]
     
     #Khởi tạo biến item
     item1=Item()
-    item2=Item()
     enough_item=False
     num_item=0
     #Các tham số
@@ -363,11 +372,6 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
         player_x=start_bg+100
     else:
         player_x=start_bg
-    if player.buff_speed:
-        max_speed=25
-    else:
-        max_speed=20
-    max_com=20
     com1_x=start_bg
     com2_x=start_bg
     com3_x=start_bg
@@ -391,6 +395,8 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
 
     #Vòng lặp game
     start=False
+    start_time=False
+    time=360
     while running:
         fpsClock.tick(FPS)
         for event in pygame.event.get():
@@ -398,7 +404,13 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
                 pygame.quit()
                 sys.exit()
             if event.type==pygame.MOUSEBUTTONDOWN:
+                start_time=True
+        if start_time:
+            time-=1
+            if time==0:
                 start=True
+                start_time=False
+    
         #Vẽ background
         screen.blit(bg,(bg_x,0))
         screen.blit(bg,(bg_x+1280,0))
@@ -406,12 +418,12 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
         if road_time==0:
             screen.blit(start_road,(road_x,240))
             screen.blit(road,(road_x+1280,240))
-        elif road_time>=10:
+        elif road_time>=20:
             screen.blit(finish_road,(road_x,240))
         else:
             screen.blit(road,(road_x,240))
             screen.blit(road,(road_x+1280,240))
-        road_speed=5
+        road_speed=20
 
         #Vẽ xe
         player.draw(player_x,player_rank)
@@ -427,9 +439,9 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
                 if road_x<-1280:
                     road_x=0
                     road_time+=1
-                if road_time==10:
+                if road_time==20:
                     road_finish=True
-                bg_x-=1
+                bg_x-=2
                 if bg_x<-1280:
                     bg_x=0
             else:
@@ -450,23 +462,23 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
             #Nếu đường đã chạy hết, cho xe dùng ở đích
             if road_finish:
                 if not(player.finish()):
-                    player_x+=random.randint(0,max_speed)
+                    player_x+=random.randint(0,20)
                     if player_x>1100:
                         player_x=1100
                 if not(com1.finish()):
-                    com1_x+=random.randint(0,max_com)
+                    com1_x+=random.randint(0,20)
                     if com1_x>1100:
                         com1_x=1100
                 if not(com2.finish()):
-                    com2_x+=random.randint(0,max_com)
+                    com2_x+=random.randint(0,20)
                     if com2_x>1100:
                         com2_x=1100
                 if not(com3.finish()):
-                    com3_x+=random.randint(0,max_com)
+                    com3_x+=random.randint(0,20)
                     if com3_x>1100:
                         com3_x=1100
                 if not(com4.finish()):
-                    com4_x+=random.randint(0,max_com)
+                    com4_x+=random.randint(0,20)
                     if com4_x>1100:
                         com4_x=1100
             
@@ -512,44 +524,7 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
                         num_item-=1
                         item1.exist=False
                 
-                #Tương tự với item 2
-                if not(item2.exist):
-                    lane_item2=random.randint(1,5)
-                    item2_y=280+(lane_item2-1)*80
-                    item2_x=random.randint(600,1000)
-                    if item2_x<end_bg and item2_y!=item1_y:
-                        item2.exist=True
-                        num_item+=1
-                if item2.exist:
-                    item2.draw(item2_x,item2_y,screen)
-                    item2_x-=road_speed
-                    if item2_x<0:
-                        item2.exist=False
-                        num_item-=1
-
-                    if player.is_in(item2_x-50,item2_y):
-                        player_x=item2.affect(player_x)
-                        num_item-=1
-                        item2.exist=False
-                    if com1.is_in(item2_x-50,item2_y):
-                        com1_x=item2.affect(com1_x)
-                        num_item-=1
-                        item2.exist=False
-                    if com2.is_in(item2_x-50,item2_y):
-                        com2_x=item2.affect(com2_x)
-                        num_item-=1
-                        item2.exist=False
-                    if com3.is_in(item2_x-50,item2_y):
-                        com3_x=item2.affect(com3_x)
-                        num_item-=1
-                        item2.exist=False
-                    if com4.is_in(item2_x-50,item2_y):
-                        com4_x=item2.affect(com4_x)
-                        num_item-=1
-                        item2.exist=False
-                
-                #Nếu đã đủ 2 item -> không thêm item nữa
-                if num_item>2:
+                if num_item>1:
                     enough_item=True
                 else:
                     enough_item=False
@@ -577,22 +552,31 @@ def run_game(map_index,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_speed
                 ranked=True
             # bảng xếp hạng
         if ranked:
+            user.money_update(player,buff_gold)
             check_rank = ranked_rs(r'MainGame\Image\bxh.jpg',screen_size[0]/2,4*screen_size[1]/5,player,com1,com2,com3,com4,user,screen)
-
+        #Vẽ thời gian
+        if start_time and time>=240:
+                draw_text("3",time_font,red,screen,screen_size[0]/2,screen_size[1]/2)
+        elif start_time and time>=120:
+                draw_text("2",time_font,(255,253,85),screen,screen_size[0]/2,screen_size[1]/2)
+        elif start_time and time>0:
+                draw_text("1",time_font,(0,255,0),screen,screen_size[0]/2,screen_size[1]/2)
         pygame.display.update()
         
         #thoát ra menu
         if check_rank ==False:
             break
     return player_rank
-def shopping(screen,user,buff_speed,buff_start):
+def shopping(screen,user,buff_gold,buff_start):
     #Khởi tạo nút
-    buy_buff_speed=Buttons(200,100,item_pic,340,360,screen)
+    buy_buff_gold=Buttons(200,100,buff_gold_img,340,360,screen)
     buy_better_start=Buttons(200,100,buff_start_img,740,360,screen)
     quit_bt=Buttons(200,100,return_bt_img,540,570,screen)
+    time=0
     #Vòng lặp
     running_shop=True
     while running_shop:
+        fpsClock.tick(FPS)
         spot = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
@@ -602,22 +586,28 @@ def shopping(screen,user,buff_speed,buff_start):
                 new_screen_size = event.dict["size"]
                 screen_resize(new_screen_size)
             if event.type==pygame.MOUSEBUTTONDOWN:
-                if buy_buff_speed.is_in(spot[0],spot[1]):
+                if buy_buff_gold.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
-                    if not(buff_speed):
-                        user.money_change(-2000)
-                    buff_speed=True
-                    buy_buff_speed.img=item_pic
+                    if not(buff_gold):
+                        if user.money>=2000:
+                            user.money_change(-2000)
+                            buff_gold=True
+                        else:
+                            draw_text("Bạn không đủ vàng!",ms_font,white,screen,screen_size[0]/2,screen_size[1]/2)
+                            time=240
                 if buy_better_start.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     if not(buff_start):
-                        user.money_change(-2000)
-                    buff_start=True
-                    buy_better_start.img=item_pic
+                        if user.money>=2000:
+                            user.money_change(-2000)
+                            buff_start=True
+                        else:
+                            draw_text("Bạn không đủ vàng!",ms_font,white,screen,screen_size[0]/2,screen_size[1]/2)
+                            time=240
                 if quit_bt.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     running_shop=False
-            if buy_buff_speed.is_in(spot[0],spot[1]):
+            if buy_buff_gold.is_in(spot[0],spot[1]):
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
             elif buy_better_start.is_in(spot[0],spot[1]):
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
@@ -625,16 +615,19 @@ def shopping(screen,user,buff_speed,buff_start):
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
             else:
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
-        if buff_speed:
-            buy_buff_speed.img=car_pic1
+        if buff_gold:
+            buy_buff_gold.img=pygame.transform.scale(buff_gold_ed_img,(200,100))
         if buff_start:
             buy_better_start.img=pygame.transform.scale(buff_start_ed_img,(200,100))
-        screen.blit(bg,(0,0))
-        buy_better_start.draw()
-        buy_buff_speed.draw()
-        quit_bt.draw()
+        if time<=0:
+            screen.blit(bg,(0,0))
+            buy_better_start.draw()
+            buy_buff_gold.draw()
+            quit_bt.draw()
+        else:
+            time-=1
         pygame.display.update()
-    return (buff_speed,buff_start)
+    return (buff_gold,buff_start)
 
 def set_name(screen):
     sname=""
@@ -642,7 +635,7 @@ def set_name(screen):
     name=True
     type_name =False
     name_gap = Buttons(19*screen_size[0]/40,screen_size[1]/12,item_pic,screen_size[0]/4,screen_size[1]/4,screen)
-    accept_bt = Buttons(screen_size[1]/12,screen_size[1]/12,item_pic,29*screen_size[0]/40,screen_size[1]/4,screen)
+    accept_bt = Buttons(screen_size[1]/12,screen_size[1]/12,next_ms_bt_img,29*screen_size[0]/40,screen_size[1]/4,screen)
     while name:
         count +=1
         if (count // 150) % 2 == 0:
@@ -695,9 +688,11 @@ def set_name(screen):
 
 
 def pick_map(buff_speed,buff_start,current_user,player_name,char,screen):
-    pick_bt=Buttons(200,100,item_pic,540,570,screen)
-    next_bt=Buttons(100,100,item_pic,980,340,screen)
-    back_bt=Buttons(100,100,item_pic,200,340,screen)
+    pick_bt=Buttons(200,100,start_bt_img,540,570,screen)
+    next_bt=Buttons(100,100,next_ms_bt_img,980,340,screen)
+    back_bt=Buttons(100,100,back_ms_bt_img,200,340,screen)
+    skill=(char - char%5)/5
+    avt=(char % 5)
     index=0
     run_map=True
     while run_map:
@@ -714,7 +709,7 @@ def pick_map(buff_speed,buff_start,current_user,player_name,char,screen):
                 if pick_bt.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     run_map=False
-                    run_game(index,car_pic2,car_pic2,car_pic2,car_pic2,car_pic2,buff_speed,buff_start,current_user,player_name,screen)
+                    run_game(index,skill,car_pic2,car_pic2,car_pic2,car_pic2,car_pic2,buff_speed,buff_start,current_user,player_name,screen)
                 #Chuyển map muốn chọn
                 if next_bt.is_in(spot[0],spot[1]):
                     index+=1
@@ -1015,8 +1010,7 @@ def ranked_rs(image,width,height,player,com1,com2,com3,com4,user,screen):
     home_bt = Buttons(screen_size[0]/16,screen_size[1]/8,return_bt_img,screen_size[0]/4,9*screen_size[1]/10,screen)
     save_bt = Buttons(screen_size[0]/16,screen_size[1]/8,save_bt_img,3*screen_size[0]/4,9*screen_size[1]/10,screen)
     lt = [player,com1,com2,com3,com4]
-    #Cập nhật tiền 
-    user.money_update(player)
+
     # sắp xếp thứ tự xếp hạng
     j=0
     while j < len(lt):
