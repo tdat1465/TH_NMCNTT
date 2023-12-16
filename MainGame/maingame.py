@@ -6,7 +6,7 @@ from tkinter import *
 pygame.init()
 pygame.mixer.init()
 pygame.mixer.set_num_channels(10)
-FPS = 120
+FPS = 60
 fpsClock = pygame.time.Clock()
 
 #Cửa sổ games
@@ -51,6 +51,130 @@ pick_maps=[pick_map1,pick_map2,pick_map3,pick_map4,pick_map5]
 car_pic2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\car.jpg'),(150,150))
 car_pic1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\car.jpg'),(150,150))
 item_pic=pygame.image.load(r'MainGame\Image\item.jpg')
+
+
+
+cars0_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars0_0.jpg'),(150,150))
+cars0_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars0_1.jpg'),(150,150))
+cars0_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars0_2.jpg'),(150,150))
+cars0_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars0_3.jpg'),(150,150))
+cars0=[cars0_0,cars0_1,cars0_2,cars0_3]
+
+cars1_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars1_0.jpg'),(150,150))
+cars1_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars1_1.jpg'),(150,150))
+cars1_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars1_2.jpg'),(150,150))
+cars1_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars1_3.jpg'),(150,150))
+cars1=[cars1_0,cars1_1,cars1_2,cars1_3]
+
+cars2_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars2_0.jpg'),(150,150))
+cars2_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars2_1.jpg'),(150,150))
+cars2_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars2_2.jpg'),(150,150))
+cars2_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars2_2.jpg'),(150,150))
+cars2=[cars2_0,cars2_1,cars2_2,cars2_3]
+
+cars3_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars3_0.jpg'),(150,150))
+cars3_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars3_1.jpg'),(150,150))
+cars3_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars3_2.jpg'),(150,150))
+cars3_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars3_3.jpg'),(150,150))
+cars3=[cars3_0,cars3_1,cars3_2,cars3_3]
+
+cars4_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars4_0.jpg'),(150,150))
+cars4_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars4_1.jpg'),(150,150))
+cars4_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars4_2.jpg'),(150,150))
+cars4_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars4_3.jpg'),(150,150))
+cars4=[cars4_0,cars4_1,cars4_2,cars4_3]
+
+cars5_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars5_0.jpg'),(150,150))
+cars5_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars5_1.jpg'),(150,150))
+cars5_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars5_2.jpg'),(150,150))
+cars5_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars5_3.jpg'),(150,150))
+cars5=[cars5_0,cars5_1,cars5_2,cars5_3]
+
+cars6_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars6_0.jpg'),(150,150))
+cars6_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars6_1.jpg'),(150,150))
+cars6_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars6_2.jpg'),(150,150))
+cars6_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars6_3.jpg'),(150,150))
+cars6=[cars6_0,cars6_1,cars6_2,cars6_3]
+
+cars7_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars7_0.jpg'),(150,150))
+cars7_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars7_1.jpg'),(150,150))
+cars7_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars7_2.jpg'),(150,150))
+cars7_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars7_3.jpg'),(150,150))
+cars7=[cars7_0,cars7_1,cars7_2,cars7_3]
+
+cars8_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars8_0.jpg'),(150,150))
+cars8_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars8_1.jpg'),(150,150))
+cars8_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars8_2.jpg'),(150,150))
+cars8_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars8_3.jpg'),(150,150))
+cars8=[cars8_0,cars8_1,cars8_2,cars8_3]
+
+cars9_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars9_0.jpg'),(150,150))
+cars9_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars9_1.jpg'),(150,150))
+cars9_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars9_2.jpg'),(150,150))
+cars9_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars9_3.jpg'),(150,150))
+cars9=[cars9_0,cars9_1,cars9_2,cars9_3]
+
+cars10_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars10_0.jpg'),(150,150))
+cars10_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars10_1.jpg'),(150,150))
+cars10_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars10_2.jpg'),(150,150))
+cars10_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars10_3.jpg'),(150,150))
+cars10=[cars10_0,cars10_1,cars10_2,cars10_3]
+
+cars11_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars11_0.jpg'),(150,150))
+cars11_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars11_1.jpg'),(150,150))
+cars11_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars11_2.jpg'),(150,150))
+cars11_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars11_3.jpg'),(150,150))
+cars11=[cars11_0,cars11_1,cars11_2,cars11_3]
+
+cars12_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars12_0.jpg'),(150,150))
+cars12_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars12_1.jpg'),(150,150))
+cars12_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars12_2.jpg'),(150,150))
+cars12_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars12_3.jpg'),(150,150))
+cars12=[cars12_0,cars12_1,cars12_2,cars12_3]
+
+cars13_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars13_0.jpg'),(150,150))
+cars13_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars13_1.jpg'),(150,150))
+cars13_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars13_2.jpg'),(150,150))
+cars13_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars13_3.jpg'),(150,150))
+cars13=[cars13_0,cars13_1,cars13_2,cars13_3]
+
+cars14_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars14_0.jpg'),(150,150))
+cars14_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars14_1.jpg'),(150,150))
+cars14_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars14_2.jpg'),(150,150))
+cars14_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars14_3.jpg'),(150,150))
+cars14=[cars14_0,cars14_1,cars14_2,cars14_3]
+
+cars15_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars15_0.jpg'),(150,150))
+cars15_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars15_1.jpg'),(150,150))
+cars15_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars15_2.jpg'),(150,150))
+cars15_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars15_3.jpg'),(150,150))
+cars15=[cars15_0,cars15_1,cars15_2,cars15_3]
+
+cars16_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars16_0.jpg'),(150,150))
+cars16_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars16_1.jpg'),(150,150))
+cars16_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars16_2.jpg'),(150,150))
+cars16_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars16_3.jpg'),(150,150))
+cars16=[cars16_0,cars16_1,cars16_2,cars16_3]
+
+cars17_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars17_0.jpg'),(150,150))
+cars17_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars17_1.jpg'),(150,150))
+cars17_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars17_2.jpg'),(150,150))
+cars17_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars17_3.jpg'),(150,150))
+cars17=[cars17_0,cars17_1,cars17_2,cars17_3]
+
+cars18_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars18_0.jpg'),(150,150))
+cars18_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars18_1.jpg'),(150,150))
+cars18_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars18_2.jpg'),(150,150))
+cars18_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars18_3.jpg'),(150,150))
+cars18=[cars18_0,cars18_1,cars18_2,cars18_3]
+
+cars19_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars19_0.jpg'),(150,150))
+cars19_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars19_1.jpg'),(150,150))
+cars19_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars19_2.jpg'),(150,150))
+cars19_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars19_3.jpg'),(150,150))
+cars19=[cars19_0,cars19_1,cars19_2,cars19_3]
+
+cars_img=[cars0,cars1,cars2,cars3,cars4,cars5,cars6,cars7,cars8,cars9,cars10,cars11,cars12,cars13,cars14,cars15,cars16,cars17,cars18,cars19]
 
 #Ảnh nút
 start_bt_img=pygame.image.load(r'MainGame\Image\start_bt.jpg')
@@ -332,26 +456,29 @@ def snakeGame(gameSurface):
 
 
 
-
-
-
-
-
+    
 
 
 
 
 
 #Vào đua
-def run_game(map_index,skill,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff_gold,better_start,user,player_name,screen):
+def run_game(map_index,char,buff_gold,better_start,user,player_name,screen):
     #Phát âm thanh
     pygame.mixer.Channel(3).play(car_sound,-1)
     #Khởi tạo xe 
-    player=Car(screen,player_pic,3,better_start)
-    com1=Car(screen,com1_pic,1)
-    com2=Car(screen,com2_pic,2)
-    com3=Car(screen,com3_pic,4)
-    com4=Car(screen,com4_pic,5)
+    skill=(char - char%5)/5
+    player_img=cars_img[char][0]
+    com1_char=random.randint(0,19)
+    com2_char=random.randint(0,19)
+    com3_char=random.randint(0,19)
+    com4_char=random.randint(0,19)
+
+    player=Car(screen,player_img,3,better_start)
+    com1=Car(screen,cars_img[com1_char][0],1)
+    com2=Car(screen,cars_img[com2_char][0],2)
+    com3=Car(screen,cars_img[com3_char][0],4)
+    com4=Car(screen,cars_img[com4_char][0],5)
 
     #Set tên
     player.name = player_name
@@ -392,11 +519,12 @@ def run_game(map_index,skill,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff
     check_rank = True
     road_finish=False
     road_time=0    
+    index=0
 
     #Vòng lặp game
     start=False
     start_time=False
-    time=360
+    time=180
     while running:
         fpsClock.tick(FPS)
         for event in pygame.event.get():
@@ -426,6 +554,15 @@ def run_game(map_index,skill,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff
         road_speed=20
 
         #Vẽ xe
+        if index>=3:
+            index=0
+        else:
+            index+=1
+        player.image=cars_img[char][index]
+        com1.image=cars_img[com1_char][index]
+        com2.image=cars_img[com2_char][index]
+        com3.image=cars_img[com3_char][index]
+        com4.image=cars_img[com4_char][index]
         player.draw(player_x,player_rank)
         com1.draw(com1_x,com1_rank)
         com2.draw(com2_x,com2_rank)
@@ -434,6 +571,18 @@ def run_game(map_index,skill,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff
 
         #Cho đường, background chạy
         if start:
+            #Animation
+            if index>=3:
+                index=0
+            else:
+                index+=1
+            player.image=cars_img[char][index]
+            com1.image=cars_img[com1_char][index]
+            com2.image=cars_img[com2_char][index]
+            com3.image=cars_img[com3_char][index]
+            com4.image=cars_img[com4_char][index]
+            
+            #Vẽ đường
             if not(road_finish):
                 road_x-=road_speed
                 if road_x<-1280:
@@ -555,9 +704,9 @@ def run_game(map_index,skill,player_pic,com1_pic,com2_pic,com3_pic,com4_pic,buff
             user.money_update(player,buff_gold)
             check_rank = ranked_rs(r'MainGame\Image\bxh.jpg',screen_size[0]/2,4*screen_size[1]/5,player,com1,com2,com3,com4,user,screen)
         #Vẽ thời gian
-        if start_time and time>=240:
+        if start_time and time>=120:
                 draw_text("3",time_font,red,screen,screen_size[0]/2,screen_size[1]/2)
-        elif start_time and time>=120:
+        elif start_time and time>=60:
                 draw_text("2",time_font,(255,253,85),screen,screen_size[0]/2,screen_size[1]/2)
         elif start_time and time>0:
                 draw_text("1",time_font,(0,255,0),screen,screen_size[0]/2,screen_size[1]/2)
@@ -594,7 +743,7 @@ def shopping(screen,user,buff_gold,buff_start):
                             buff_gold=True
                         else:
                             draw_text("Bạn không đủ vàng!",ms_font,white,screen,screen_size[0]/2,screen_size[1]/2)
-                            time=240
+                            time=120
                 if buy_better_start.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     if not(buff_start):
@@ -603,7 +752,7 @@ def shopping(screen,user,buff_gold,buff_start):
                             buff_start=True
                         else:
                             draw_text("Bạn không đủ vàng!",ms_font,white,screen,screen_size[0]/2,screen_size[1]/2)
-                            time=240
+                            time=120
                 if quit_bt.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     running_shop=False
@@ -687,15 +836,16 @@ def set_name(screen):
 
 
 
-def pick_map(buff_speed,buff_start,current_user,player_name,char,screen):
+def pick_map(buff_gold,buff_start,current_user,player_name,char,screen):
     pick_bt=Buttons(200,100,start_bt_img,540,570,screen)
     next_bt=Buttons(100,100,next_ms_bt_img,980,340,screen)
     back_bt=Buttons(100,100,back_ms_bt_img,200,340,screen)
     skill=(char - char%5)/5
-    avt=(char % 5)
+    player_img=cars_img[char]
     index=0
     run_map=True
     while run_map:
+        fpsClock.tick(FPS)
         spot = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
@@ -709,7 +859,7 @@ def pick_map(buff_speed,buff_start,current_user,player_name,char,screen):
                 if pick_bt.is_in(spot[0],spot[1]):
                     pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
                     run_map=False
-                    run_game(index,skill,car_pic2,car_pic2,car_pic2,car_pic2,car_pic2,buff_speed,buff_start,current_user,player_name,screen)
+                    run_game(index,char,buff_gold,buff_start,current_user,player_name,screen)
                 #Chuyển map muốn chọn
                 if next_bt.is_in(spot[0],spot[1]):
                     index+=1
@@ -745,6 +895,7 @@ def pick_char(screen,username):
     index=0
     run_map=True
     while run_map:
+        fpsClock.tick(FPS)
         spot = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
@@ -815,35 +966,35 @@ def pick_char(screen,username):
             else:
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
         if index==0:
-            pick1.img=pygame.transform.scale(item_pic,(pick1.height,pick1.width))
-            pick2.img=pygame.transform.scale(item_pic,(pick2.height,pick2.width))
-            pick3.img=pygame.transform.scale(item_pic,(pick3.height,pick3.width))
-            pick4.img=pygame.transform.scale(item_pic,(pick4.height,pick4.width))
+            pick1.img=pygame.transform.scale(cars3_0,(pick1.height,pick1.width))
+            pick2.img=pygame.transform.scale(cars7_0,(pick2.height,pick2.width))
+            pick3.img=pygame.transform.scale(cars13_0,(pick3.height,pick3.width))
+            pick4.img=pygame.transform.scale(cars19_0,(pick4.height,pick4.width))
             pick5.img=pygame.transform.scale(item_pic,(pick5.height,pick5.width))
         if index==1:
-            pick1.img=car_pic1
-            pick2.img=car_pic1
-            pick3.img=car_pic1
-            pick4.img=car_pic1
-            pick5.img=car_pic1
+            pick1.img=cars0_0
+            pick2.img=cars1_0
+            pick3.img=cars2_0
+            pick4.img=cars3_0
+            pick5.img=cars4_0
         if index==2:
-            pick1.img=car_pic1
-            pick2.img=car_pic1
-            pick3.img=car_pic1
-            pick4.img=car_pic1
-            pick5.img=car_pic1
+            pick1.img=cars5_0
+            pick2.img=cars6_0
+            pick3.img=cars7_0
+            pick4.img=cars8_0
+            pick5.img=cars9_0
         if index==3:
-            pick1.img=car_pic1
-            pick2.img=car_pic1
-            pick3.img=car_pic1
-            pick4.img=car_pic1
-            pick5.img=car_pic1
+            pick1.img=cars10_0
+            pick2.img=cars11_0
+            pick3.img=cars12_0
+            pick4.img=cars13_0
+            pick5.img=cars14_0
         if index==4:
-            pick1.img=car_pic1
-            pick2.img=car_pic1
-            pick3.img=car_pic1
-            pick4.img=car_pic1
-            pick5.img=car_pic1
+            pick1.img=cars15_0
+            pick2.img=cars16_0
+            pick3.img=cars17_0
+            pick4.img=cars18_0
+            pick5.img=cars19_0
         if index==5:
             pick1.img=car_pic1
             pick2.img=car_pic1
@@ -1026,6 +1177,7 @@ def ranked_rs(image,width,height,player,com1,com2,com3,com4,user,screen):
         if sw == False:
             break
     while running_rank:
+        fpsClock.tick(FPS)
         spot=pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
@@ -1073,6 +1225,7 @@ def History(user,display,page,screen):
     hrt_rect = hrt_surf.get_rect(topleft=(0,0))
     return_bt = Buttons(screen_size[0]/24,screen_size[0]/24,return_bt_img,23*screen_size[0]/24,screen_size[1]-screen_size[0]/24,screen)
     while run:
+        fpsClock.tick(FPS)
         spot=pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -1111,6 +1264,7 @@ def profile_display(user,screen):
     lists = ['','','','','']
     color = [black,black,black,black,black]
     while run:
+        fpsClock.tick(FPS)
         if len(user.file_list) % 5 != 0:
             max_page = len(user.file_list) // 5 + 1
         else :
@@ -1233,10 +1387,8 @@ def login():
             #chuyển màn hình chỗ này
                 root.destroy()        
                 main_menu(username)
-            else:
-                messagebox.showerror("Lỗi", "Tên đăng nhập hoặc mật khẩu không đúng!")
+        messagebox.showerror("Lỗi", "Tên đăng nhập hoặc mật khẩu không đúng!")
                 
-
     # Tạo nút đăng nhập và nút thoát
     tk.Button(root, text="Đăng nhập", command=check_login).grid(row=4, column=0)
 
