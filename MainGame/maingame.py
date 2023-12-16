@@ -254,16 +254,60 @@ class User():
 class Car():
     name=''
     color=(0,0,0)
-    def __init__(self,screen,image,lane,better_start=False):
+    def __init__(self,screen,skill,image,lane,better_start=False):
         self.image=image
         self.y=280+(lane-1)*80
         self.better_start=better_start
         self.screen=screen
+        self.skill = skill
+        #tạo biến để chạy xe nếu xe chạy = 1 ko chạy = 0
+        self.run = 1
+        #vận tốc xe
+        self.v = 20
+        self.skill_active = False
+        #thời gian hồi skill
+        self.skill_cycle = 120
+        #thời gian skill
+        self.skill_duration = 10
     def draw(self,x,rank):
         self.x=x
         self.rect=self.image.get_rect(center=(self.x,self.y))
         self.screen.blit(self.image,self.rect)
         self.rank=rank
+    def active_skill(self,road_time,road_finish):
+        #Skill tăng tốc độ
+        if self.skill == 2 and self.skill_active == False:
+            self.v = int(self.v*1.1)
+            self.skill_active = True
+        #Mặc định cho các xe
+        elif road_finish == True:
+            self.run = 1
+        #Skill khoảng một thời gian thì tăng tốc tạm thời
+        elif self.skill == 3 and road_time != 0:
+            if self.skill_active == False:
+                self.skill_cycle += 2
+                self.run = 0
+            if self.skill_cycle >= 720:
+                self.skill_cycle = 0
+                self.skill_active = True
+                self.v = int(self.v*0.1) 
+            if self.skill_active:
+                self.run = 1
+                self.skill_duration -= 1
+                if self.skill_duration < 0:
+                    self.skill_active = False
+                    self.v *= 10
+                    self.skill_duration = 20
+        #tăng tốc nhanh trong thời gian ngắn(xài được 1 lần duy nhất)
+        elif self.skill == 4:
+            if self.skill_active:
+                self.skill_duration -= 1
+                self.run = 1
+            if self.skill_duration < 0:
+                self.skill_active = False
+            if self.skill_cycle > 0 and road_time > random.randint(5,10):
+                self.skill_cycle -= 50
+                self.skill_active = True
     def is_in(self,x,y):
         if self.x>=x-50 and self.x<=x+50 and self.y==y:
             return True
@@ -474,11 +518,11 @@ def run_game(map_index,char,buff_gold,better_start,user,player_name,screen):
     com3_char=random.randint(0,19)
     com4_char=random.randint(0,19)
 
-    player=Car(screen,player_img,3,better_start)
-    com1=Car(screen,cars_img[com1_char][0],1)
-    com2=Car(screen,cars_img[com2_char][0],2)
-    com3=Car(screen,cars_img[com3_char][0],4)
-    com4=Car(screen,cars_img[com4_char][0],5)
+    player=Car(screen,char//5,player_img,3,better_start)
+    com1=Car(screen,com1_char//5,cars_img[com1_char][0],1)
+    com2=Car(screen,com2_char//5,cars_img[com2_char][0],2)
+    com3=Car(screen,com3_char//5,cars_img[com3_char][0],4)
+    com4=Car(screen,com4_char//5,cars_img[com4_char][0],5)
 
     #Set tên
     player.name = player_name
@@ -609,28 +653,53 @@ def run_game(map_index,char,buff_gold,better_start,user,player_name,screen):
                 com4_x=0
 
             #Nếu đường đã chạy hết, cho xe dùng ở đích
-            if road_finish:
-                if not(player.finish()):
-                    player_x+=random.randint(0,20)
-                    if player_x>1100:
-                        player_x=1100
-                if not(com1.finish()):
-                    com1_x+=random.randint(0,20)
-                    if com1_x>1100:
-                        com1_x=1100
-                if not(com2.finish()):
-                    com2_x+=random.randint(0,20)
-                    if com2_x>1100:
-                        com2_x=1100
-                if not(com3.finish()):
-                    com3_x+=random.randint(0,20)
-                    if com3_x>1100:
-                        com3_x=1100
-                if not(com4.finish()):
-                    com4_x+=random.randint(0,20)
-                    if com4_x>1100:
-                        com4_x=1100
+            if player_x < 540 and com1_x < 540 and com2_x < 540 and com3_x < 540 and com4_x < 540:
+                player.run = 1
+                com1.run = 1
+                com2.run = 1
+                com3.run = 1
+                com4.run = 1
+            elif road_finish:
+                player.run = 1
+                com1.run = 1
+                com2.run = 1
+                com3.run = 1
+                com4.run = 1
+            else:
+                player.run = 0
+                com1.run = 0
+                com2.run = 0
+                com3.run = 0
+                com4.run = 0
+            #skill
+            player.active_skill(road_time,road_finish)
+            com1.active_skill(road_time,road_finish)
+            com2.active_skill(road_time,road_finish)
+            com3.active_skill(road_time,road_finish)
+            com4.active_skill(road_time,road_finish)
             
+
+            
+            if not(player.finish()):
+                player_x+=random.randint(0,player.v)*player.run
+                if player_x>1100:
+                    player_x=1100
+            if not(com1.finish()):
+                com1_x+=random.randint(0,com1.v)*com1.run
+                if com1_x>1100:
+                    com1_x=1100
+            if not(com2.finish()):
+                com2_x+=random.randint(0,com2.v)*com2.run
+                if com2_x>1100:
+                    com2_x=1100
+            if not(com3.finish()):
+                com3_x+=random.randint(0,com3.v)*com3.run
+                if com3_x>1100:
+                    com3_x=1100
+            if not(com4.finish()):
+                com4_x+=random.randint(0,com4.v)*com4.run
+                if com4_x>1100:
+                    com4_x=1100
             #Đưa item vào
 
             if not(enough_item): #Nếu chưa đủ 2 item đang xuất hiện
@@ -642,7 +711,6 @@ def run_game(map_index,char,buff_gold,better_start,user,player_name,screen):
                     if item1_x<end_bg:
                         item1.exist=True
                         num_item+=1
-                
                 #Vẽ item 1
                 if item1.exist:
                     item1.draw(item1_x,item1_y,screen)
@@ -653,25 +721,50 @@ def run_game(map_index,char,buff_gold,better_start,user,player_name,screen):
                     
                     #Xử lý nếu xe chạm vào item
                     if player.is_in(item1_x,item1_y):
-                        player_x=item1.affect(player_x)
-                        num_item-=1
-                        item1.exist=False
+                        if player.skill == 0:#tăng hiệu ứng của bùa
+                            player_x=item1.affect(player,1.5)
+                            num_item-=1
+                            item1.exist=False
+                        elif player.skill != 1:#skill 1 kháng bùa
+                            player_x=item1.affect(player_x,1)
+                            num_item-=1
+                            item1.exist=False
                     if com1.is_in(item1_x,item1_y):
-                        com1_x=item1.affect(com1_x)
-                        num_item-=1
-                        item1.exist=False
+                        if com1.skill == 0:
+                            com1_x=item1.affect(com1_x,1.5)
+                            num_item-=1
+                            item1.exist=False
+                        elif com1.skill != 1:
+                            com1_x=item1.affect(com1_x,1)
+                            num_item-=1
+                            item1.exist=False
                     if com2.is_in(item1_x,item1_y):
-                        com2_x=item1.affect(com2_x)
-                        num_item-=1
-                        item1.exist=False
+                        if com2.skill == 0:
+                            com2_x=item1.affect(com2_x,1.5)
+                            num_item-=1
+                            item1.exist=False
+                        elif com2.skill != 1:
+                            com2_x=item1.affect(com2_x,1)
+                            num_item-=1
+                            item1.exist=False
                     if com3.is_in(item1_x,item1_y):
-                        com3_x=item1.affect(com3_x)
-                        num_item-=1
-                        item1.exist=False
+                        if com3.skill == 0:
+                            com3_x=item1.affect(com3_x,1.5)
+                            num_item-=1
+                            item1.exist=False
+                        elif com3.skill != 1:
+                            com3_x=item1.affect(com3_x,1)
+                            num_item-=1
+                            item1.exist=False
                     if com4.is_in(item1_x,item1_y):
-                        com4_x=item1.affect(com4_x)
-                        num_item-=1
-                        item1.exist=False
+                        if com4.skill == 0:
+                            com4_x=item1.affect(com4_x,1.5)
+                            num_item-=1
+                            item1.exist=False
+                        elif com4.skill != 1:
+                            com4_x=item1.affect(com4_x,1)
+                            num_item-=1
+                            item1.exist=False
                 
                 if num_item>1:
                     enough_item=True
