@@ -1,6 +1,9 @@
 import pygame, sys, time, random, os
 import tkinter as tk
 import tkinter.messagebox as messagebox
+from email.message import EmailMessage
+import smtplib
+from PIL import ImageTk,Image
 from pygame.locals import *
 from tkinter import *
 pygame.init()
@@ -174,7 +177,37 @@ cars19_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars19_2
 cars19_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars19_3.jpg'),(150,150))
 cars19=[cars19_0,cars19_1,cars19_2,cars19_3]
 
-cars_img=[cars0,cars1,cars2,cars3,cars4,cars5,cars6,cars7,cars8,cars9,cars10,cars11,cars12,cars13,cars14,cars15,cars16,cars17,cars18,cars19]
+cars20_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars20_0.jpg'),(150,150))
+cars20_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars20_1.jpg'),(150,150))
+cars20_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars20_2.jpg'),(150,150))
+cars20_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars20_3.jpg'),(150,150))
+cars20=[cars20_0,cars20_1,cars20_2,cars20_3]
+
+cars21_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars21_0.jpg'),(150,150))
+cars21_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars21_1.jpg'),(150,150))
+cars21_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars21_2.jpg'),(150,150))
+cars21_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars21_3.jpg'),(150,150))
+cars21=[cars21_0,cars21_1,cars21_2,cars21_3]
+
+cars22_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars22_0.jpg'),(150,150))
+cars22_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars22_1.jpg'),(150,150))
+cars22_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars22_2.jpg'),(150,150))
+cars22_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars22_3.jpg'),(150,150))
+cars22=[cars22_0,cars22_1,cars22_2,cars22_3]
+
+cars23_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars23_0.jpg'),(150,150))
+cars23_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars23_1.jpg'),(150,150))
+cars23_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars23_2.jpg'),(150,150))
+cars23_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars23_3.jpg'),(150,150))
+cars23=[cars23_0,cars23_1,cars23_2,cars23_3]
+
+cars24_0=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars24_0.jpg'),(150,150))
+cars24_1=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars24_1.jpg'),(150,150))
+cars24_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars24_2.jpg'),(150,150))
+cars24_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars24_3.jpg'),(150,150))
+cars24=[cars24_0,cars24_1,cars24_2,cars24_3]
+
+cars_img=[cars0,cars1,cars2,cars3,cars4,cars5,cars6,cars7,cars8,cars9,cars10,cars11,cars12,cars13,cars14,cars15,cars16,cars17,cars18,cars19,cars20,cars21,cars22,cars23]
 
 #Ảnh nút
 start_bt_img=pygame.image.load(r'MainGame\Image\start_bt.jpg')
@@ -182,6 +215,7 @@ buff_start_img=pygame.image.load(r'MainGame\Image\startbuff.jpg')
 buff_start_ed_img=pygame.image.load(r'MainGame\Image\start_buff.jpg')
 buff_gold_img=pygame.image.load(r'MainGame\Image\goldbuff.jpg')
 buff_gold_ed_img=pygame.image.load(r'MainGame\Image\gold_buff.jpg')
+guide_img=pygame.transform.scale(pygame.image.load(r'MainGame\Image\guide.png'),(720,720))
 
 #Thêm âm thanh
 flash_sound=pygame.mixer.Sound(r'MainGame\Sound\Effect\flash.mp3')
@@ -511,12 +545,16 @@ def run_game(map_index,char,buff_gold,better_start,user,player_name,screen):
     #Phát âm thanh
     pygame.mixer.Channel(3).play(car_sound,-1)
     #Khởi tạo xe 
-    skill=(char - char%5)/5
     player_img=cars_img[char][0]
-    com1_char=random.randint(0,19)
-    com2_char=random.randint(0,19)
-    com3_char=random.randint(0,19)
-    com4_char=random.randint(0,19)
+    com1_char=random.randint(0,24)
+    com2_char=random.randint(0,24)
+    com3_char=random.randint(0,24)
+    com4_char=random.randint(0,24)
+    while com1_char==char or com2_char==char or com3_char==char or com4_char==char:
+        com1_char=random.randint(0,24)
+        com2_char=random.randint(0,24)
+        com3_char=random.randint(0,24)
+        com4_char=random.randint(0,24)
 
     player=Car(screen,char//5,player_img,3,better_start)
     com1=Car(screen,com1_char//5,cars_img[com1_char][0],1)
@@ -998,11 +1036,11 @@ def pick_map(buff_gold,buff_start,current_user,player_name,char,screen):
         pygame.display.update()
 
 def pick_char(screen,username):
-    pick1=Buttons(200,200,item_pic,280,160,screen)
-    pick2=Buttons(200,200,item_pic,540,160,screen)
-    pick3=Buttons(200,200,item_pic,800,160,screen)
-    pick4=Buttons(200,200,item_pic,410,400,screen)
-    pick5=Buttons(200,200,item_pic,670,400,screen)
+    pick1=Buttons(200,200,cars3_0,280,160,screen)
+    pick2=Buttons(200,200,cars7_0,540,160,screen)
+    pick3=Buttons(200,200,cars13_0,800,160,screen)
+    pick4=Buttons(200,200,cars19_0,410,400,screen)
+    pick5=Buttons(200,200,cars20_0,670,400,screen)
     return_bt=Buttons(150,150,return_bt_img,0,0,screen)
     accept=0
     index=0
@@ -1083,37 +1121,37 @@ def pick_char(screen,username):
             pick2.img=pygame.transform.scale(cars7_0,(pick2.height,pick2.width))
             pick3.img=pygame.transform.scale(cars13_0,(pick3.height,pick3.width))
             pick4.img=pygame.transform.scale(cars19_0,(pick4.height,pick4.width))
-            pick5.img=pygame.transform.scale(item_pic,(pick5.height,pick5.width))
+            pick5.img=pygame.transform.scale(cars20_0,(pick5.height,pick5.width))
         if index==1:
-            pick1.img=cars0_0
-            pick2.img=cars1_0
-            pick3.img=cars2_0
-            pick4.img=cars3_0
-            pick5.img=cars4_0
+            pick1.img=pygame.transform.scale(cars0_0,(pick1.height,pick1.width))
+            pick2.img=pygame.transform.scale(cars1_0,(pick1.height,pick1.width))
+            pick3.img=pygame.transform.scale(cars2_0,(pick1.height,pick1.width))
+            pick4.img=pygame.transform.scale(cars3_0,(pick1.height,pick1.width))
+            pick5.img=pygame.transform.scale(cars4_0,(pick1.height,pick1.width))
         if index==2:
-            pick1.img=cars5_0
-            pick2.img=cars6_0
-            pick3.img=cars7_0
-            pick4.img=cars8_0
-            pick5.img=cars9_0
+            pick1.img=pygame.transform.scale(cars5_0,(pick1.height,pick1.width))
+            pick2.img=pygame.transform.scale(cars6_0,(pick1.height,pick1.width))
+            pick3.img=pygame.transform.scale(cars7_0,(pick1.height,pick1.width))
+            pick4.img=pygame.transform.scale(cars8_0,(pick1.height,pick1.width))
+            pick5.img=pygame.transform.scale(cars9_0,(pick1.heig1ht,pick1.width))
         if index==3:
-            pick1.img=cars10_0
-            pick2.img=cars11_0
-            pick3.img=cars12_0
-            pick4.img=cars13_0
-            pick5.img=cars14_0
+            pick1.img=pygame.transform.scale(cars10_0,(pick1.height,pick1.width))
+            pick2.img=pygame.transform.scale(cars11_0,(pick1.height,pick1.width))
+            pick3.img=pygame.transform.scale(cars12_0,(pick1.height,pick1.width))
+            pick4.img=pygame.transform.scale(cars13_0,(pick1.height,pick1.width))
+            pick5.img=pygame.transform.scale(cars14_0,(pick1.height,pick1.width))
         if index==4:
-            pick1.img=cars15_0
-            pick2.img=cars16_0
-            pick3.img=cars17_0
-            pick4.img=cars18_0
-            pick5.img=cars19_0
+            pick1.img=pygame.transform.scale(cars15_0,(pick1.height,pick1.width))
+            pick2.img=pygame.transform.scale(cars16_0,(pick1.height,pick1.width))
+            pick3.img=pygame.transform.scale(cars17_0,(pick1.height,pick1.width))
+            pick4.img=pygame.transform.scale(cars18_0,(pick1.height,pick1.width))
+            pick5.img=pygame.transform.scale(cars19_0,(pick1.height,pick1.width))
         if index==5:
-            pick1.img=car_pic1
-            pick2.img=car_pic1
-            pick3.img=car_pic1
-            pick4.img=car_pic1
-            pick5.img=car_pic1
+            pick1.img=pygame.transform.scale(cars20_0,(pick1.height,pick1.width))
+            pick2.img=pygame.transform.scale(cars21_0,(pick1.height,pick1.width))
+            pick3.img=pygame.transform.scale(cars22_0,(pick1.height,pick1.width))
+            pick4.img=pygame.transform.scale(cars23_0,(pick1.height,pick1.width))
+            pick5.img=pygame.transform.scale(cars24_0,(pick1.height,pick1.width))
         screen.blit(bg,(0,0))
         pick1.draw()
         pick2.draw()
@@ -1142,6 +1180,7 @@ def main_menu(username):
     next_music_bt=Buttons(30,30,next_ms_bt_img,1050,100,screen)
     back_music_bt=Buttons(30,30,back_ms_bt_img,1000,100,screen)
     stop_music_bt=Buttons(30,30,dis_ms_bt_img,940,100,screen)
+    guide_bt=Buttons(70,70,help_bt_img,1160,600,screen)
 
     #Nhạc
     ms_index=0
@@ -1155,6 +1194,7 @@ def main_menu(username):
     buff=(False,False)
     char=-1
     player_name='2'
+    draw_guide=False
     running_menu=True
     #Vòng lặp
     while running_menu:
@@ -1227,6 +1267,11 @@ def main_menu(username):
                     stop_music_bt.img=pygame.transform.scale(dis_ms_bt_img,(30,30))
                     musics[ms_index].play()
                     stop=False
+                if guide_bt.is_in(spot[0],spot[1]):
+                    draw_guide=True
+                if not(guide_bt.is_in(spot[0],spot[1])) and draw_guide:
+                    draw_guide=False
+                
 
 
             #Thay đổi hình dạng chuột
@@ -1244,6 +1289,8 @@ def main_menu(username):
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
             elif stop_music_bt.is_in(spot[0],spot[1]):
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
+            elif guide_bt.is_in(spot[0],spot[1]):
+                pygame.mouse.set_cursor(SYSTEM_CURSOR_HAND)
             else:
                 pygame.mouse.set_cursor(SYSTEM_CURSOR_ARROW)
         if time <= 0:
@@ -1258,6 +1305,9 @@ def main_menu(username):
         next_music_bt.draw()
         back_music_bt.draw()
         stop_music_bt.draw()
+        guide_bt.draw()
+        if draw_guide:
+            screen.blit(guide_img,(280,0))
         #Phát nhạc
         if not(is_play) and not(stop):
             musics[ms_index].play()
