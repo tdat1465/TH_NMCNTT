@@ -1950,4 +1950,5 @@ def register():
 
     if __name__ == "__main__":
         root.mainloop()
-register()
+if __name__ == "__main__":
+        register()
