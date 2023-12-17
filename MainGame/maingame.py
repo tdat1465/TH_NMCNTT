@@ -3,9 +3,10 @@ import tkinter as tk
 import tkinter.messagebox as messagebox
 from email.message import EmailMessage
 import smtplib
-from PIL import ImageTk,Image
 from pygame.locals import *
 from tkinter import *
+from PIL import ImageTk,Image
+
 pygame.init()
 pygame.mixer.init()
 pygame.mixer.set_num_channels(10)
@@ -207,7 +208,7 @@ cars24_2=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars24_2
 cars24_3=pygame.transform.scale(pygame.image.load(r'MainGame\Image\Cars\cars24_3.jpg'),(150,150))
 cars24=[cars24_0,cars24_1,cars24_2,cars24_3]
 
-cars_img=[cars0,cars1,cars2,cars3,cars4,cars5,cars6,cars7,cars8,cars9,cars10,cars11,cars12,cars13,cars14,cars15,cars16,cars17,cars18,cars19,cars20,cars21,cars22,cars23]
+cars_img=[cars0,cars1,cars2,cars3,cars4,cars5,cars6,cars7,cars8,cars9,cars10,cars11,cars12,cars13,cars14,cars15,cars16,cars17,cars18,cars19,cars20,cars21,cars22,cars23,cars23]
 
 #Ảnh nút
 start_bt_img=pygame.image.load(r'MainGame\Image\start_bt.jpg')
@@ -254,6 +255,8 @@ class User():
         self.username=username
         #Tạo đường dẫn
         self.path='MainGame/'+self.username+'_history'
+        if os.path.exists(self.path) == False:
+            os.mkdir(self.path)
         self.file_list = os.listdir(self.path)
     def create_player_history(self):#tạo một lần duy nhất cho 1 user
         if os.path.exists(self.path) == False:
@@ -372,7 +375,6 @@ class Item():
             pygame.mixer.Channel(5).play(flash_sound)
         else:
             pass
-            pygame.mixer.Channel(6).play(tele_sound)
         return x
     
 class Buttons():
@@ -1524,19 +1526,205 @@ def profile_display(user,screen):
         draw_text('Money:'+str(user.money),name_font,black,screen,screen_size[0]/4,screen_size[1]/6)
         pygame.display.flip()
 
+def email():
+    # Tạo cửa sổ giao diện
+    window = tk.Tk()
+    window.title("Xác thực bằng email")
+    window.geometry('1280x720')
+
+    # Tạo một đối tượng Canvas
+    canvas = Canvas(window, width=1280, height=720)
+    canvas.pack()
+
+    # Tải hình ảnh và lưu trữ nó trong một biến
+    image = ImageTk.PhotoImage(Image.open(r'MainGame\picture\background3.jpg'))
+
+    # Vẽ hình ảnh trên Canvas
+    canvas.create_image(0, 0, anchor=NW, image=image)
+
+    # Thay đổi các giá trị dưới đây bằng thông tin của bạn
+    sender_email = "carbet947@gmail.com"
+
+    subject = "Car Bet"
+    random_number = random.randint(100000,999999)
+    message1 = "Your code is "
+    message2 = random_number
+    text = f"Subject: {subject}\n{message1}{message2}"
+
+    # Tạo kết nối đến máy chủ email
+    server = smtplib.SMTP("smtp.gmail.com",587)
+    server.starttls()
+    server.login(sender_email,"qvnceohsanbgfgns")
+
+
+    def on_entry_focus_in(event):
+        if entry_username.get() == "Tên đăng nhập":
+            entry_username.delete(0, tk.END)
+
+    def on_entry_focus_out(event):
+        if entry_username.get() == "":
+            entry_username.insert(0, "Tên đăng nhập")
+
+    entry_username = tk.Entry(window, width=19, font=("Times New Roman", 28), fg="black", bg="white")
+    entry_username.insert(0, "Tên đăng nhập")
+    entry_username.bind("<FocusIn>", on_entry_focus_in)
+    entry_username.bind("<FocusOut>", on_entry_focus_out)
+
+    entry_username.pack()
+    # Đặt vị trí của entry trên ảnh:
+    entry_username.place(x=442, y=184)
+
+
+    def on_entry_focus_in(event):
+        if entry_email.get() == "Email":
+            entry_email.delete(0, tk.END)
+
+    def on_entry_focus_out(event):
+        if entry_email.get() == "":
+            entry_email.insert(0, "Email")
+
+    entry_email = tk.Entry(window, width=19, font=("Times New Roman", 28), fg="black", bg="white")
+    entry_email.insert(0, "Email")
+    entry_email.bind("<FocusIn>", on_entry_focus_in)
+    entry_email.bind("<FocusOut>", on_entry_focus_out)
+
+    entry_email.pack()
+    # Đặt vị trí của entry trên ảnh:
+    entry_email.place(x=442, y=269)
+
+    # Tạo button gửi mail
+    image_sendmail = Image.open(r'MainGame\picture\button_sendmail.jpg')
+    resize_sendmail_img = image_sendmail.resize((376,63))
+    photo_sendmail = ImageTk.PhotoImage(resize_sendmail_img)
+
+
+    #Quên mk, đăng nhập bằng mail
+    def send_email(): 
+        email = entry_email.get()
+
+        # Mở file email.txt và đọc tất cả các email lưu trong đó
+        with open("email.txt", "r") as file:
+            emails = file.read().splitlines()
+
+        # Kiểm tra email có trong file email.txt hay không
+        for email in emails:
+            username,receiver = email.strip().split(":")
+
+            if username == entry_username.get() and receiver == entry_email.get():
+                # Gửi email
+                server.sendmail(sender_email, email, text)
+
+    # Tạo button và chèn ảnh vào button 
+    button_sendmail = Button(window, image=photo_sendmail, command=send_email)
+    canvas.create_window(623, 373, anchor=CENTER, window=button_sendmail)
+
+    entry_code = tk.Entry(window, width=19, font=("Times New Roman", 28), fg="black", bg="white")
+    entry_code.pack()
+    # Đặt vị trí của entry trên ảnh:
+    entry_code.place(x=442, y=459)
+
+    image_checkcode = Image.open(r'MainGame\picture\button_checkcode.jpg')
+    resize_checkcode_img = image_checkcode.resize((376,63))
+    photo_checkcode = ImageTk.PhotoImage(resize_checkcode_img)
+
+    # Gán một hàm xử lý sự kiện cho nút
+    def button_checkcode():
+        ma_so = entry_code.get()
+        if float(ma_so) == message2:
+            messagebox.showinfo("Thông báo","Mã số chính xác!")
+        else:
+            messagebox.showerror("Thông báo", "Mã số không chính xác")
+
+    # Tạo button và chèn ảnh vào button 
+    button_checkcode = Button(window, image=photo_checkcode, command=button_checkcode)
+    canvas.create_window(623, 569, anchor=CENTER, window=button_checkcode)
+
+
+    image_return = Image.open(r'MainGame\picture\button_return.jpg')
+    resize_return_img = image_return.resize((130,50))
+    photo_return = ImageTk.PhotoImage(resize_return_img)
+
+    # Gán một hàm xử lý sự kiện cho nút
+    def button_return():
+        window.destroy()
+        login()
+        
+    # Tạo button và chèn ảnh vào button 
+    button_return = Button(window, image=photo_return, command=button_return)
+    canvas.create_window(630, 650, anchor=CENTER, window=button_return)
+
+    # Chạy chương trình
+    window.mainloop()
+
+
 def login():
-    # Tạo cửa sổ đăng nhập
-    root = Tk()
-    root.title("Đăng nhập")
+    window = tk.Tk()
+    window.title("Đăng nhập")
+    window.geometry('1280x720')
 
-    # Tạo các label và entry cho tên đăng nhập và mật khẩu
-    tk.Label(root, text="Tên đăng nhập").grid(row=0, column=0)
-    username_entry = tk.Entry(root)
-    username_entry.grid(row=1, column=0)
+        # Tạo một đối tượng Canvas
+    canvas = Canvas(window, width=1280, height=720)
+    canvas.pack()
 
-    tk.Label(root, text="Mật khẩu").grid(row=2, column=0)
-    password_entry = tk.Entry(root, show="*")
-    password_entry.grid(row=3, column=0)
+    # Tải hình ảnh và lưu trữ nó trong một biến
+    image = ImageTk.PhotoImage(Image.open(r'MainGame\picture\background1.jpg'))
+
+    # Vẽ hình ảnh trên Canvas
+    canvas.create_image(0, 0, anchor=NW, image=image)
+
+    def on_entry_focus_in(event):
+        if entry_username.get() == "Tên đăng nhập":
+            entry_username.delete(0, tk.END)
+
+    def on_entry_focus_out(event):
+        if entry_username.get() == "":
+            entry_username.insert(0, "Tên đăng nhập")
+
+    entry_username = tk.Entry(window, width=19, font=("Times New Roman", 28), fg="black", bg="white")
+    entry_username.insert(0, "Tên đăng nhập")
+    entry_username.bind("<FocusIn>", on_entry_focus_in)
+    entry_username.bind("<FocusOut>", on_entry_focus_out)
+
+    entry_username.pack()
+    # Đặt vị trí của entry trên ảnh:
+    entry_username.place(x=442, y=184)
+
+    def on_entry_focus_in(event):
+        if entry_password.get() == "Mật khẩu":
+            entry_password.delete(0, tk.END)
+
+    def on_entry_focus_out(event):
+        if entry_password.get() == "":
+            entry_password.insert(0, "Mật khẩu")
+
+    entry_password = tk.Entry(window, width=19, font=("Times New Roman", 28), fg="black", bg="white")
+    entry_password.insert(0, "Mật khẩu")
+    entry_password.bind("<FocusIn>", on_entry_focus_in)
+    entry_password.bind("<FocusOut>", on_entry_focus_out)
+
+    entry_password.pack()
+    # Đặt vị trí của entry trên ảnh:
+    entry_password.place(x=442, y=269)
+
+    # Tạo button đăng ký
+    image_login = Image.open(r'MainGame\picture\button_dangnhap.jpg')
+    resize_login_img = image_login.resize((376,63))
+    photo_login = ImageTk.PhotoImage(resize_login_img)
+
+
+    image_signin = Image.open(r'MainGame\picture\button_dangky.jpg')
+    resize_sigin_img = image_signin.resize((376,63))
+    photo_signin = ImageTk.PhotoImage(resize_sigin_img)
+
+
+    # Gán một hàm xử lý sự kiện cho nút
+    def button_register():
+        window.destroy()
+        register()
+
+    # Tạo button và chèn ảnh vào button 
+    button_register = Button(window, image=photo_signin,command=button_register)
+    canvas.create_window(623, 550, anchor=CENTER, window=button_register)
 
     # Tạo hàm kiểm tra tên đăng nhập và mật khẩu    
     def check_login():
@@ -1546,56 +1734,218 @@ def login():
 
         # Kiểm tra tên đăng nhập và mật khẩu có trong file accounts.txt hay không
         for account in accounts:
-            username, password = account.strip().split(":")
-            if username == username_entry.get() and password == password_entry.get():
-            #chuyển màn hình chỗ này
-                root.destroy()        
-                main_menu(username)
-        messagebox.showerror("Lỗi", "Tên đăng nhập hoặc mật khẩu không đúng!")
-                
-    # Tạo nút đăng nhập và nút thoát
-    tk.Button(root, text="Đăng nhập", command=check_login).grid(row=4, column=0)
+            user1, passw = account.strip().split(":")
+            if user1 == entry_username.get() and passw == entry_password.get():
+                messagebox.showinfo("Thông báo", "Đăng nhập thành công.")
+                window.destroy()
+                main_menu(user1)          
+        messagebox.showerror("Thông báo", "Tên đăng nhập hoặc mật khẩu không đúng!")
+
+        # Tạo button và chèn ảnh vào button 
+    button_login = Button(window, image=photo_login, command=check_login)
+    canvas.create_window(623, 373, anchor=CENTER, window=button_login)
+
+    image_forget = Image.open(r'MainGame\picture\button_forget.jpg')
+    resize_forget_img = image_forget.resize((238,50))
+    photo_forget = ImageTk.PhotoImage(resize_forget_img)
+
+    # Gán một hàm xử lý sự kiện cho nút
+    def button_forget():
+        window.destroy()
+        email()
+
+    # Tạo button và chèn ảnh vào button 
+    button_forget = Button(window, image=photo_forget,command=button_forget)
+    canvas.create_window(738, 675, anchor=CENTER, window=button_forget)
 
     # Chạy chương trình
-    root.mainloop()
+    window.mainloop()
 
 def register():
-    root = Tk()
+    root = tk.Tk()
     root.title("Đăng ký tài khoản")
+    root.geometry('1280x720')
 
-    label_username = Label(root, text="Tên đăng nhập:")
-    label_username.pack()
-    entry_username = Entry(root)
+    # Tạo một đối tượng Canvas
+    canvas = Canvas(root, width=1280, height=720)
+    canvas.pack()
+
+    # Tải hình ảnh và lưu trữ nó trong một biến
+    image = ImageTk.PhotoImage(Image.open(r'MainGame\picture\background2.jpg'))
+
+    # Vẽ hình ảnh trên Canvas
+    canvas.create_image(0, 0, anchor=NW, image=image)
+
+    def on_entry_focus_in(event):
+        if entry_username.get() == "Tên đăng nhập":
+            entry_username.delete(0, tk.END)
+
+    def on_entry_focus_out(event):
+        if entry_username.get() == "":
+            entry_username.insert(0, "Tên đăng nhập")
+
+    entry_username = tk.Entry(root, width=19, font=("Times New Roman", 28), fg="black", bg="white")
+    entry_username.insert(0, "Tên đăng nhập")
+    entry_username.bind("<FocusIn>", on_entry_focus_in)
+    entry_username.bind("<FocusOut>", on_entry_focus_out)
+
     entry_username.pack()
+    # Đặt vị trí của entry trên ảnh:
+    entry_username.place(x=442, y=184)
 
-    label_password = Label(root, text="Mật khẩu:")
-    label_password.pack()
-    entry_password = Entry(root, show="*")
+    def on_entry_focus_in(event):
+        if entry_password.get() == "Mật khẩu":
+            entry_password.delete(0, tk.END)
+
+    def on_entry_focus_out(event):
+        if entry_password.get() == "":
+            entry_password.insert(0, "Mật khẩu")
+
+    entry_password = tk.Entry(root, width=19, font=("Times New Roman", 28), fg="black", bg="white")
+    entry_password.insert(0, "Mật khẩu")
+    entry_password.bind("<FocusIn>", on_entry_focus_in)
+    entry_password.bind("<FocusOut>", on_entry_focus_out)
+
     entry_password.pack()
+    # Đặt vị trí của entry trên ảnh:
+    entry_password.place(x=442, y=269)
 
-    button_register = Button(root, text="Đăng ký")
-    button_login = Button(root, text="Đăng nhập")
+    def on_entry_focus_in(event):
+        if entry_email.get() == "Email":
+            entry_email.delete(0, tk.END)
+
+    def on_entry_focus_out(event):
+        if entry_email.get() == "":
+            entry_email.insert(0, "Email")
+
+    entry_email = tk.Entry(root, width=19, font=("Times New Roman", 28), fg="black", bg="white")
+    entry_email.insert(0, "Email")
+    entry_email.bind("<FocusIn>", on_entry_focus_in)
+    entry_email.bind("<FocusOut>", on_entry_focus_out)
+
+    entry_email.pack()
+    # Đặt vị trí của entry trên ảnh:
+    entry_email.place(x=442, y=354)
+
+    # Tạo button đăng nhập
+    image_login = Image.open(r'MainGame\picture\button_dangnhap.jpg')
+    resize_login_img = image_login.resize((376,63))
+    photo_login = ImageTk.PhotoImage(resize_login_img)
+
+    # Gán một hàm xử lý sự kiện cho nút
+    def button_login():
+        root.destroy()
+        login()
+        
+    # Tạo button và chèn ảnh vào button 
+    button_login = Button(root, image=photo_login, command=button_login)
+    canvas.create_window(623, 620, anchor=CENTER, window=button_login)
+
+    sender_email = "carbet947@gmail.com"
+    subject = "Car Bet"
+    random_number = random.randint(100000,999999)
+    message1 = "Your code is "
+    message2 = random_number
+    text = f"Subject: {subject}\n{message1}{message2}"
+
+    # Tạo kết nối đến máy chủ email
+    server = smtplib.SMTP("smtp.gmail.com",587)
+    server.starttls()
+    server.login(sender_email,"qvnceohsanbgfgns")
+
 
     def check_register():
         username = entry_username.get()
         password = entry_password.get()
-    # Kiểm tra xem tên đăng nhập và mật khẩu có hợp lệ không
-        if len(username) == 0 or len(password) == 0:
-            messagebox.showerror("Lỗi", "Vui lòng nhập tên đăng nhập và mật khẩu.")
-        else:
-            # Lưu tài khoản vào file accounts.txt
-            with open("accounts.txt", "a") as file:
-                file.write(f"{username}:{password}\n")
-            messagebox.showinfo("Thông báo", "Đăng ký thành công.")
-    button_register.config(command=check_register)
-    button_register.pack()
-    def turn_to_login():
-        root.destroy()
-        login()
-    #khúc này tui tạo button đăng nhập, ông chuyển màn hình khúc này
-    button_login.config(command=turn_to_login)
-    button_login.pack()
-    root.mainloop()
+        email = entry_email.get()
+ 
+        def check_code_and_save_account():
+
+            # Tạo cửa sổ giao diện
+            root = tk.Tk()
+            root.title("Xác nhận tài khoản")
+            root.geometry('1280x720')
+
+            # Tạo một đối tượng Canvas
+            canvas = Canvas(root, width=1280, height=720)
+            canvas.pack()
+
+            # Tải hình ảnh và lưu trữ nó trong một biến
+            image = ImageTk.PhotoImage(Image.open(r'MainGame\picture\background4.jpg'))
+
+            # Vẽ hình ảnh trên Canvas
+            canvas.create_image(0, 0, anchor=NW, image=image)
+
+            entry_code = tk.Entry(root, width=19, font=("Times New Roman", 28), fg="black", bg="white")
+            entry_code.pack()
+            # Đặt vị trí của entry trên ảnh:
+            entry_code.place(x=440, y=269)
+
+            image_checkcode = Image.open('MainGame/picture/button_checkcode.jpg')
+            resize_checkcode_img = image_checkcode.resize((376,63))
+            photo_checkcode = ImageTk.PhotoImage(resize_checkcode_img)
+
+            # Gán một hàm xử lý sự kiện cho nút
+            def button_check():
+                ma_so = entry_code.get()
+                if float(ma_so) == message2:
+                    with open("accounts.txt", 'a') as file:
+                        file.write(f"{username}:{password}\n")  
+                    with open("email.txt",'a') as file:
+                        file.write(f"{username}:{email}\n")
+                    messagebox.showinfo("Thông báo", "Đăng ký tài khoản thành công!")
+                else:
+                    messagebox.showerror("Thông báo", "Mã số không chính xác!")
+                
+
+            # Tạo button và chèn ảnh vào button 
+            button_checkcode = Button(root, image=photo_checkcode, command=button_check)
+            canvas.create_window(621, 378, anchor=CENTER, window=button_checkcode)
+
+            image_return = Image.open('MainGame/picture/button_return.jpg')
+            resize_return_img = image_return.resize((130,50))
+            photo_return = ImageTk.PhotoImage(resize_return_img)
+
+            # Gán một hàm xử lý sự kiện cho nút
+            def button_return():
+                root.destroy()
+                register()
+    
+            # Tạo button và chèn ảnh vào button 
+            button_return = Button(root, image=photo_return, command=button_return)
+            canvas.create_window(630, 460, anchor=CENTER, window=button_return)
+
+            root.mainloop()
+
+
+        with open("accounts.txt", "r") as f:
+                accounts = f.readlines()
+            # Kiểm tra tên đăng nhập và mật khẩu có trong file accounts.txt hay không
+                for account in accounts:
+                    username1, password1 = account.strip().split(":")
+                    if username1 == entry_username.get() and password1 == entry_password.get():
+                        messagebox.showinfo("Thông báo", "Tài khoản đã tồn tại.")
+                    else: 
+        # Kiểm tra xem tên đăng nhập và mật khẩu có hợp lệ không
+                        if (entry_username.get() == "" or entry_password.get() == "" or entry_username.get() == "Tên đăng nhập" or entry_password.get()=="Mật khẩu"):
+                            messagebox.showerror("Lỗi", "Vui lòng nhập tên đăng nhập và mật khẩu.")
+                        else:  
+                            if (entry_email.get()=="" or entry_email.get()=="Email"):
+                                messagebox.showerror("Lỗi", "Vui lòng nhập email.")
+                            else:
+                                server.sendmail(sender_email, email, text)
+                                root.destroy()
+                                check_code_and_save_account()
+                                
+        
+
+    image_signin = Image.open('MainGame/picture/button_dangky.jpg')
+    resize_sigin_img = image_signin.resize((376,63))
+    photo_signin = ImageTk.PhotoImage(resize_sigin_img)
+
+    # Tạo button và chèn ảnh vào button 
+    button_register = Button(root, image=photo_signin,command=check_register)
+    canvas.create_window(623, 483, anchor=CENTER, window=button_register)
 
     if __name__ == "__main__":
         root.mainloop()
