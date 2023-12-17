@@ -1947,6 +1947,6 @@ def register():
     button_register = Button(root, image=photo_signin,command=check_register)
     canvas.create_window(623, 483, anchor=CENTER, window=button_register)
 
+
     if __name__ == "__main__":
-        register()
-register()
+        root.mainloop()
