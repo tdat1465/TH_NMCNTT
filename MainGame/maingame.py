@@ -814,7 +814,6 @@ def run_game(map_index,char,buff_gold,better_start,user,player_name,screen):
                 ranked=True
             # bảng xếp hạng
         if ranked:
-            user.money_update(player,buff_gold)
             check_rank = ranked_rs(r'MainGame\Image\bxh.jpg',screen_size[0]/2,4*screen_size[1]/5,player,com1,com2,com3,com4,user,screen)
         #Vẽ thời gian
         if start_time and time>=120:
@@ -827,6 +826,7 @@ def run_game(map_index,char,buff_gold,better_start,user,player_name,screen):
         
         #thoát ra menu
         if check_rank ==False:
+            user.money_update(player,buff_gold)
             break
     return player_rank
 def shopping(screen,user,buff_gold,buff_start):
@@ -1179,6 +1179,7 @@ def main_menu(username):
                     player_name = set_name(screen)
                     if char>=0:
                         pick_map(buff[0],buff[1],current_user,player_name,char,screen)
+                    buff=(False,False)
                     running_menu=True
                 #Nút shop
                 if shop_bt.is_in(spot[0],spot[1]):
