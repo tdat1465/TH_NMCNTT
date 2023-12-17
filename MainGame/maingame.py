@@ -229,7 +229,7 @@ white=(255,255,255)
 black=(0,0,0)
 red=(255,0,0)
 #Tham số
-current_money=20000
+
 #Set font
 font = pygame.font.SysFont("Consolas", 50, bold=True, italic=False)
 new_font = pygame.font.SysFont("Consolas", 30, bold=True, italic=False)
@@ -248,8 +248,17 @@ def screen_resize(new_screen_size):
     screen = pygame.display.set_mode(new_screen_size,pygame.RESIZABLE)  
 #Class
 class User():
+    exist=False
     def __init__(self,username):
-        self.money = current_money
+        with open("gold.txt","r") as f:
+            moneys=f.readlines()
+        for money in moneys:
+            user1,current_money=money.strip().split(":")
+            if username==user1:
+                self.money=int(current_money)
+                self.exist=True
+        if not(self.exist):
+            self.money=10000
         self.htr_in = 1
         self.hrt = ''
         self.username=username
@@ -265,6 +274,7 @@ class User():
         self.image_file = self.path + '/history'+str(self.htr_in)+'.png'
         pygame.image.save(screen,self.image_file)
         self.htr_in +=1
+        self.file_list = os.listdir(self.path)
     def get_file_name(self,index):
         name = ''
         if index < len(self.file_list):
@@ -854,6 +864,7 @@ def run_game(map_index,char,buff_gold,better_start,user,player_name,screen):
                 ranked=True
             # bảng xếp hạng
         if ranked:
+            
             check_rank = ranked_rs(r'MainGame\Image\bxh.jpg',screen_size[0]/2,4*screen_size[1]/5,player,com1,com2,com3,com4,user,screen)
         #Vẽ thời gian
         if start_time and time>=120:
@@ -1135,7 +1146,7 @@ def pick_char(screen,username):
             pick2.img=pygame.transform.scale(cars6_0,(pick1.height,pick1.width))
             pick3.img=pygame.transform.scale(cars7_0,(pick1.height,pick1.width))
             pick4.img=pygame.transform.scale(cars8_0,(pick1.height,pick1.width))
-            pick5.img=pygame.transform.scale(cars9_0,(pick1.heig1ht,pick1.width))
+            pick5.img=pygame.transform.scale(cars9_0,(pick1.height,pick1.width))
         if index==3:
             pick1.img=pygame.transform.scale(cars10_0,(pick1.height,pick1.width))
             pick2.img=pygame.transform.scale(cars11_0,(pick1.height,pick1.width))
@@ -1205,7 +1216,10 @@ def main_menu(username):
         spot = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
+                with open("gold.txt","a") as f:
+                    f.write(f"{username}:{str(current_user.money)}\n")
                 pygame.quit()
+                sys.quit()
             #Thay đổi kích thước màn hình
             if event.type == pygame.VIDEORESIZE:
                 new_screen_size = event.dict["size"]
