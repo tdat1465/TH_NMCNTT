@@ -1948,5 +1948,5 @@ def register():
     canvas.create_window(623, 483, anchor=CENTER, window=button_register)
 
     if __name__ == "__main__":
-        root.mainloop()
+        register()
 register()
