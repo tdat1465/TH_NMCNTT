@@ -518,7 +518,7 @@ def run_game(map_index,char,buff_gold,better_start,user,player_name,screen):
     com3_char=random.randint(0,19)
     com4_char=random.randint(0,19)
 
-    player=Car(screen,4,player_img,3,better_start)
+    player=Car(screen,char//5,player_img,3,better_start)
     com1=Car(screen,com1_char//5,cars_img[com1_char][0],1)
     com2=Car(screen,com2_char//5,cars_img[com2_char][0],2)
     com3=Car(screen,com3_char//5,cars_img[com3_char][0],4)
@@ -681,7 +681,7 @@ def run_game(map_index,char,buff_gold,better_start,user,player_name,screen):
 
             
             if not(player.finish()):
-                player_x+=random.randint(0,300)*player.run
+                player_x+=random.randint(0,player.v)*player.run
                 if player_x>1100:
                     player_x=1100
             if not(com1.finish()):
@@ -808,7 +808,7 @@ def run_game(map_index,char,buff_gold,better_start,user,player_name,screen):
                 com4_rank=rank
                 rank+=1
             #Kết thúc
-            #Thêm điều kiện xếp hạng xong mới kết thúc vì xe cuối cùng không gọi hàm check_ranked 
+            #Thêm điều kiện xếp hạng xong mới kết thúc vì xe cuối cùng không gọi hàm 
             if (player.finish() and com1.finish() and com2.finish() and com3.finish() and com4.finish()) and road_finish and (not(player.check_ranked()) and not(com1.check_ranked()) and not(com2.check_ranked()) and not(com3.check_ranked()) and not(com4.check_ranked())):
                 start=False
                 ranked=True
